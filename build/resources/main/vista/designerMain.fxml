@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox minHeight="785.0" prefHeight="832.0" prefWidth="1166.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorMain">
+   <children>
+      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="1096.0">
+         <children>
+            <Button fx:id="btnSalir" contentDisplay="TOP" onAction="#btnAccionSalir" prefHeight="59.0" prefWidth="0.0" text="_Salir">
+               <graphic>
+                  <ImageView fx:id="imgSalir" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic></Button>
+            <ImageView fx:id="imgUsuario" fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets left="820.0" />
+               </HBox.margin>
+            </ImageView>
+            <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="421.0">
+               <children>
+                  <Label fx:id="txtNombreUsuario" text="Nombre" />
+                  <Label fx:id="txtEmailUsuario" prefHeight="37.0" prefWidth="180.0" text="Correo">
+                     <padding>
+                        <Insets top="20.0" />
+                     </padding>
+                  </Label>
+               </children>
+               <HBox.margin>
+                  <Insets left="15.0" />
+               </HBox.margin>
+            </VBox>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <padding>
+            <Insets left="15.0" />
+         </padding>
+      </HBox>
+      <TabPane prefHeight="700.0" prefWidth="1136.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Libros">
+               <content>
+                  <VBox alignment="CENTER" prefHeight="666.0" prefWidth="1136.0">
+                     <children>
+                        <HBox>
+                           <children>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnVerLibros" contentDisplay="TOP" disable="true" onAction="#btnAccionVerLibros" text="_Ver">
+                                       <graphic>
+                                          <ImageView fx:id="imgVerLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnEditarLibros" contentDisplay="TOP" disable="true" onAction="#btnAccionEditarLibros" text="_Editar">
+                                       <graphic>
+                                          <ImageView fx:id="imgEditarLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="621.0" prefWidth="933.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="826.0">
+                                       <children>
+                                          <Label text="¿Qué libros quieres visualizar?">
+                                             <HBox.margin>
+                                                <Insets left="15.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <VBox alignment="CENTER" prefHeight="99.0" prefWidth="133.0">
+                                             <children>
+                                                <RadioButton fx:id="opcTodosLibros" minWidth="130.0" mnemonicParsing="false" selected="true" text="Todos los libros">
+                                                   <VBox.margin>
+                                                      <Insets />
+                                                   </VBox.margin></RadioButton>
+                                                <RadioButton fx:id="opcDisponibles" minWidth="130.0" mnemonicParsing="false" text="Libros dispoblibles">
+                                                   <VBox.margin>
+                                                      <Insets bottom="10.0" top="10.0" />
+                                                   </VBox.margin>
+                                                </RadioButton>
+                                                <RadioButton fx:id="opcReservas" minWidth="130.0" mnemonicParsing="false" text="Mis reservas">
+                                                   <VBox.margin>
+                                                      <Insets />
+                                                   </VBox.margin>
+                                                </RadioButton>
+                                             </children>
+                                             <HBox.margin>
+                                                <Insets left="15.0" />
+                                             </HBox.margin>
+                                          </VBox>
+                                          <ImageView fx:id="imgLupaLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                             <HBox.margin>
+                                                <Insets left="325.0" />
+                                             </HBox.margin>
+                                          </ImageView>
+                                          <TextField fx:id="txtFldLibro" minWidth="200.0" promptText="Introduce un título">
+                                             <HBox.margin>
+                                                <Insets left="15.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
+                                    <TableView fx:id="tbvLibros" cache="true" maxWidth="900.0" prefHeight="523.0" prefWidth="600.0">
+                                      <columns>
+                                        <TableColumn fx:id="colISBNLibros" prefWidth="173.0" text="ISBN" />
+                                        <TableColumn fx:id="colTituloLibros" prefWidth="303.0" text="Titulo" />
+                                          <TableColumn fx:id="colTotalCopiasLibros" prefWidth="209.0" text="Total de Copias" />
+                                          <TableColumn fx:id="colCopiasDisponiblesLibros" prefWidth="212.0" text="Copias disponibles" />
+                                      </columns>
+                                       <VBox.margin>
+                                          <Insets bottom="15.0" left="15.0" />
+                                       </VBox.margin>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnAddLibros" contentDisplay="TOP" onAction="#btnAccionAddLibros" text="_Añadir">
+                                       <graphic>
+                                          <ImageView fx:id="imgAddLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnBorrarLibros" contentDisplay="TOP" disable="true" onAction="#btnAccionBorrarLibros" text="_Borrar">
+                                       <graphic>
+                                          <ImageView fx:id="imgBorrarLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="btnReservarLibros" disable="true" onAction="#btnAccionReservarLibros" prefHeight="30.0" prefWidth="400.0" text="_Reservar">
+                                 <HBox.margin>
+                                    <Insets right="20.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button fx:id="btnCancelarReserva" disable="true" mnemonicParsing="false" onAction="#btnAccionCancelarReserva" prefHeight="30.0" prefWidth="400.0" text="Cancelar Reserva">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+          </Tab>
+            <Tab text="Autores">
+               <content>
+                  <VBox alignment="CENTER" prefHeight="666.0" prefWidth="1136.0">
+                     <children>
+                        <HBox>
+                           <children>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnVerAutores" contentDisplay="TOP" disable="true" onAction="#btnAccionVerAutores" text="_Ver">
+                                       <graphic>
+                                          <ImageView fx:id="imgVerAutor" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnEditarAutores" contentDisplay="TOP" disable="true" onAction="#btnAccionEditarAutores" text="_Editar">
+                                       <graphic>
+                                          <ImageView fx:id="imgEditarAutor" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="621.0" prefWidth="933.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="826.0">
+                                       <children>
+                                          <ImageView fx:id="imgLupaAutor" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                             <HBox.margin>
+                                                <Insets left="650.0" />
+                                             </HBox.margin>
+                                          </ImageView>
+                                          <TextField fx:id="txtFldAutor" minWidth="200.0" promptText="Introduce un autor">
+                                             <HBox.margin>
+                                                <Insets left="15.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
+                                    <TableView fx:id="tbvAutores" cache="true" maxWidth="900.0" prefHeight="523.0" prefWidth="600.0">
+                                      <columns>
+                                        <TableColumn fx:id="colNombreAutores" prefWidth="298.0" text="Nombre" />
+                                        <TableColumn fx:id="colApellidoAutores" prefWidth="298.0" text="Apellidos" />
+                                          <TableColumn fx:id="colNacionalidadAutores" prefWidth="298.0" text="Nacionalidad" />
+                                      </columns>
+                                       <VBox.margin>
+                                          <Insets bottom="15.0" left="15.0" />
+                                       </VBox.margin>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnAddAutores" contentDisplay="TOP" disable="true" onAction="#btnAccionAddAutores" text="_Añadir">
+                                       <graphic>
+                                          <ImageView fx:id="imgAddAutor" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnBorrarAutores" contentDisplay="TOP" disable="true" onAction="#btnAccionBorrarAutores" text="_Borrar">
+                                       <graphic>
+                                          <ImageView fx:id="imgBorrarAutor" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+            </Tab>
+            <Tab text="Editoriales / Categorias">
+               <content>
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox prefHeight="333.0" prefWidth="1136.0">
+                           <children>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnVerEditoriales" contentDisplay="TOP" disable="true" onAction="#btnAccionVerEditoriales" text="_Ver">
+                                       <graphic>
+                                          <ImageView fx:id="imgVerEditorial" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnEditarEditoriales" contentDisplay="TOP" disable="true" onAction="#btnAccionEditarEditoriales" text="_Editar">
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                       <graphic>
+                                          <ImageView fx:id="imgEditarEditorial" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="200.0" prefWidth="920.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="915.0">
+                                       <children>
+                                          <Label text="Editoriales" />
+                                          <ImageView fx:id="imgLupaEditorial" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                             <HBox.margin>
+                                                <Insets left="645.0" />
+                                             </HBox.margin>
+                                          </ImageView>
+                                          <TextField fx:id="txtFldEditorial" promptText="Introduce una editorial">
+                                             <HBox.margin>
+                                                <Insets left="15.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <TableView fx:id="tbvEditoriales" prefHeight="230.0" prefWidth="915.0">
+                                      <columns>
+                                        <TableColumn fx:id="colIdEditoriales" prefWidth="104.0" text="id" />
+                                        <TableColumn fx:id="colNombreEditoriales" prefWidth="268.0" text="Nombre" />
+                                          <TableColumn fx:id="colDireccionEditoriales" prefWidth="268.0" text="Dirección" />
+                                          <TableColumn fx:id="colTelefonoEditoriales" prefWidth="268.0" text="Teléfono" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnAddEditoriales" contentDisplay="TOP" onAction="#btnAccionAddEditoriales" text="_Añadir">
+                                       <graphic>
+                                          <ImageView fx:id="imgAddEditorial" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnBorrarEditoriales" contentDisplay="TOP" disable="true" onAction="#btnAccionBorrarEditoriales" text="_Borrar">
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                       <graphic>
+                                          <ImageView fx:id="imgBorrarEditorial" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="333.0" prefWidth="200.0">
+                           <children>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnVerCategorias" contentDisplay="TOP" disable="true" onAction="#btnAccionVerCategorias" text="_Ver">
+                                       <graphic>
+                                          <ImageView fx:id="imgVerCategoria" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnEditarCategorias" contentDisplay="TOP" disable="true" onAction="#btnAccionEditarCategorias" text="_Editar">
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                       <graphic>
+                                          <ImageView fx:id="imgEditarCategoria" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="333.0" prefWidth="920.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="915.0">
+                                       <children>
+                                          <Label text="Categorías" />
+                                          <ImageView fx:id="imgLupaCategoria" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                             <HBox.margin>
+                                                <Insets left="643.0" />
+                                             </HBox.margin>
+                                          </ImageView>
+                                          <TextField fx:id="txtFldCategoria" promptText="Introduce una categoría">
+                                             <HBox.margin>
+                                                <Insets left="15.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <TableView fx:id="tbvCategorias" prefHeight="230.0" prefWidth="915.0">
+                                      <columns>
+                                        <TableColumn fx:id="colIdCategorias" prefWidth="170.0" text="id" />
+                                        <TableColumn fx:id="colNombreCategorias" prefWidth="739.0" text="Nombre" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnAddCategorias" contentDisplay="TOP" onAction="#btnAccionAddCategorias" text="_Añadir">
+                                       <graphic>
+                                          <ImageView fx:id="imgAddCategoria" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnBorrarCategorias" contentDisplay="TOP" disable="true" onAction="#btnAccionBorrarCategorias" text="_Borrar">
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                       <graphic>
+                                          <ImageView fx:id="imgBorrarCategoria" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+               </content>
+            </Tab>
+          <Tab fx:id="tabUsuarios" text="Usuarios">
+               <content>
+                  <VBox alignment="CENTER" prefHeight="666.0" prefWidth="1136.0">
+                     <children>
+                        <HBox>
+                           <children>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnVerUsuarios" contentDisplay="TOP" disable="true" onAction="#btnAccionVerUsuarios" text="_Ver">
+                                       <graphic>
+                                          <ImageView fx:id="imgVerUsuario" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnEditarUsuarios" contentDisplay="TOP" disable="true" onAction="#btnAccionEditarUsuarios" text="_Editar">
+                                       <graphic>
+                                          <ImageView fx:id="imgEditarUsuario" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="621.0" prefWidth="933.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="826.0">
+                                       <children>
+                                          <ImageView fx:id="imgLupaUsuario" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                             <HBox.margin>
+                                                <Insets left="650.0" />
+                                             </HBox.margin>
+                                          </ImageView>
+                                          <TextField fx:id="txtFldUsuario" minWidth="200.0" promptText="Introduce el nombre del usuario">
+                                             <HBox.margin>
+                                                <Insets left="15.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
+                                    <TableView fx:id="tbvUsuarios" cache="true" maxWidth="900.0" prefHeight="523.0" prefWidth="600.0">
+                                      <columns>
+                                        <TableColumn fx:id="colNombreUsuarios" prefWidth="179.0" text="Nombre" />
+                                        <TableColumn fx:id="colApellidosUsuarios" prefWidth="179.0" text="Apellidos" />
+                                          <TableColumn fx:id="colEmailUsuarios" prefWidth="179.0" text="Email" />
+                                          <TableColumn fx:id="colTelefonoUsuarios" prefWidth="179.0" text="Teléfono" />
+                                          <TableColumn fx:id="colDireccionUsuarios" prefWidth="179.0" text="Dirección" />
+                                      </columns>
+                                       <VBox.margin>
+                                          <Insets bottom="15.0" left="15.0" />
+                                       </VBox.margin>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Button fx:id="btnAddUsuarios" contentDisplay="TOP" onAction="#btnAccionAddUsuarios" text="_Añadir">
+                                       <graphic>
+                                          <ImageView fx:id="imgAddUsuario" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnBorrarUsuarios" contentDisplay="TOP" disable="true" onAction="#btnAccionBorrarUsuarios" text="_Borrar">
+                                       <graphic>
+                                          <ImageView fx:id="imgBorrarUsuario" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic>
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+   <padding>
+      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+   </padding>
+</VBox>

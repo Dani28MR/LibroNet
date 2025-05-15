@@ -1,0 +1,1429 @@
+
+package controlador;
+
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+import modelo.Autor;
+import modelo.Categoria;
+import modelo.ConexionSingleton;
+import modelo.Editorial;
+import modelo.Libro;
+import modelo.Modo;
+import modelo.OperacionAutor;
+import modelo.OperacionEditorial;
+import modelo.OperacionLibro;
+import modelo.OperacionUsuario;
+import modelo.RolUsuario;
+import modelo.Usuario;
+
+public class ControladorMain implements Initializable{
+
+    @FXML
+    private Button btnAddAutores;
+
+    @FXML
+    private Button btnAddCategorias;
+
+    @FXML
+    private Button btnAddEditoriales;
+
+    @FXML
+    private Button btnAddLibros;
+
+    @FXML
+    private Button btnAddUsuarios;
+
+    @FXML
+    private Button btnBorrarAutores;
+
+    @FXML
+    private Button btnBorrarCategorias;
+
+    @FXML
+    private Button btnBorrarEditoriales;
+
+    @FXML
+    private Button btnBorrarLibros;
+
+    @FXML
+    private Button btnBorrarUsuarios;
+
+    @FXML
+    private Button btnEditarAutores;
+
+    @FXML
+    private Button btnEditarCategorias;
+
+    @FXML
+    private Button btnEditarEditoriales;
+
+    @FXML
+    private Button btnEditarLibros;
+
+    @FXML
+    private Button btnEditarUsuarios;
+
+    @FXML
+    private Button btnReservarLibros;
+
+    @FXML
+    private Button btnSalir;
+    
+    @FXML
+    private Button btnCancelarReserva;
+
+    @FXML
+    private Button btnVerAutores;
+
+    @FXML
+    private Button btnVerCategorias;
+
+    @FXML
+    private Button btnVerEditoriales;
+
+    @FXML
+    private Button btnVerLibros;
+
+    @FXML
+    private Button btnVerUsuarios;
+
+    @FXML
+    private TableColumn<Autor, String> colApellidoAutores;
+
+    @FXML
+    private TableColumn<Libro, Integer> colCopiasDisponiblesLibros;
+
+    @FXML
+    private TableColumn<Editorial, String> colDireccionEditoriales;
+
+    @FXML
+    private TableColumn<Libro, String> colISBNLibros;
+
+    @FXML
+    private TableColumn<Categoria, Integer> colIdCategorias;
+
+    @FXML
+    private TableColumn<Editorial, Integer> colIdEditoriales;
+
+    @FXML
+    private TableColumn<Autor, String> colNacionalidadAutores;
+
+    @FXML
+    private TableColumn<Autor, String> colNombreAutores;
+
+    @FXML
+    private TableColumn<Categoria, String> colNombreCategorias;
+
+    @FXML
+    private TableColumn<Editorial, String> colNombreEditoriales;
+
+    @FXML
+    private TableColumn<Editorial, String> colTelefonoEditoriales;
+
+    @FXML
+    private TableColumn<Libro, String> colTituloLibros;
+
+    @FXML
+    private TableColumn<Libro, Integer> colTotalCopiasLibros;
+
+    @FXML
+    private ImageView imgAddAutor;
+
+    @FXML
+    private ImageView imgAddCategoria;
+
+    @FXML
+    private ImageView imgAddEditorial;
+
+    @FXML
+    private ImageView imgAddLibro;
+
+    @FXML
+    private ImageView imgAddUsuario;
+
+    @FXML
+    private ImageView imgBorrarAutor;
+
+    @FXML
+    private ImageView imgBorrarCategoria;
+
+    @FXML
+    private ImageView imgBorrarEditorial;
+
+    @FXML
+    private ImageView imgBorrarLibro;
+
+    @FXML
+    private ImageView imgBorrarUsuario;
+
+    @FXML
+    private ImageView imgEditarAutor;
+
+    @FXML
+    private ImageView imgEditarCategoria;
+
+    @FXML
+    private ImageView imgEditarEditorial;
+
+    @FXML
+    private ImageView imgEditarLibro;
+
+    @FXML
+    private ImageView imgEditarUsuario;
+
+    @FXML
+    private ImageView imgLupaAutor;
+
+    @FXML
+    private ImageView imgLupaCategoria;
+
+    @FXML
+    private ImageView imgLupaEditorial;
+
+    @FXML
+    private ImageView imgLupaLibro;
+
+    @FXML
+    private ImageView imgLupaUsuario;
+
+    @FXML
+    private ImageView imgSalir;
+
+    @FXML
+    private ImageView imgUsuario;
+
+    @FXML
+    private ImageView imgVerAutor;
+
+    @FXML
+    private ImageView imgVerCategoria;
+
+    @FXML
+    private ImageView imgVerEditorial;
+
+    @FXML
+    private ImageView imgVerLibro;
+
+    @FXML
+    private ImageView imgVerUsuario;
+
+    @FXML
+    private RadioButton opcDisponibles;
+
+    @FXML
+    private RadioButton opcReservas;
+
+    @FXML
+    private RadioButton opcTodosLibros;
+
+    @FXML
+    private Tab tabUsuarios;
+    
+    @FXML
+    private TableColumn<Usuario, String> colNombreUsuarios;
+    
+    @FXML
+    private TableColumn<Usuario, String> colApellidosUsuarios;
+    
+    @FXML
+    private TableColumn<Usuario, String> colEmailUsuarios;
+    
+    @FXML
+    private TableColumn<Usuario, String> colTelefonoUsuarios;
+    
+    @FXML
+    private TableColumn<Usuario, String> colDireccionUsuarios;
+
+    @FXML
+    private TableView<Autor> tbvAutores;
+
+    @FXML
+    private TableView<Categoria> tbvCategorias;
+
+    @FXML
+    private TableView<Editorial> tbvEditoriales;
+
+    @FXML
+    public TableView<Libro> tbvLibros;
+
+    @FXML
+    private TableView<Usuario> tbvUsuarios;
+
+    @FXML
+    private Label txtEmailUsuario;
+
+    @FXML
+    private TextField txtFldAutor;
+
+    @FXML
+    private TextField txtFldCategoria;
+
+    @FXML
+    private TextField txtFldEditorial;
+
+    @FXML
+    private TextField txtFldLibro;
+
+    @FXML
+    private TextField txtFldUsuario;
+
+    @FXML
+    private Label txtNombreUsuario;
+    
+    Connection conexion;
+    Statement st;
+    ResultSet rs;
+    
+    private ControladorLogin cLogin;
+    private Usuario usuarioLog;
+    private ToggleGroup tg;
+    
+    private Libro libroSeleccionado;
+    private Autor autorSeleccionado;
+    private Editorial editorialSeleccionado;
+    private Categoria categoriaSeleccionado;
+    private Usuario usuarioSeleccionado;
+    
+    
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        try {
+            conexion = ConexionSingleton.obtenerConexion();
+            if (conexion != null) {
+                st = conexion.createStatement();
+                procesarReservasExpiradas();
+                eliminarReservasMuyAntiguas();
+                configurarFiltros();
+            }
+
+            inicializarImagenes();
+            relacionarColumnas();
+            
+            tg = new ToggleGroup();
+            opcTodosLibros.setToggleGroup(tg);
+            opcDisponibles .setToggleGroup(tg);
+            opcReservas    .setToggleGroup(tg);
+
+            tbvLibros.setItems(listaTodosLibros());
+            tbvAutores.setItems(listaTodosAutores());
+            tbvEditoriales.setItems(listaTodasEditoriales());
+            tbvCategorias.setItems(listaTodasCategorias());
+            tbvUsuarios.setItems(listaTodosUsuarios());
+
+            tg.selectedToggleProperty().addListener((obs, oldT, newT) -> {
+                if (newT == null) return;
+                resetearBotonesLibros(); // Aquí sí
+                if (opcTodosLibros.isSelected()) {
+                    tbvLibros.setItems(listaTodosLibros());
+                } else if (opcDisponibles.isSelected()) {
+                    tbvLibros.setItems(listaLibrosDisponibles());
+                } else {
+                    tbvLibros.setItems(listaLibrosReservados());
+                }
+            });
+
+            // TABLA LIBROS
+            tbvLibros.setOnMouseClicked((MouseEvent ev) -> {
+                if (ev.getClickCount() == 2) {
+                    Libro sel = tbvLibros.getSelectionModel().getSelectedItem();
+                    if (sel != null) {
+                        libroSeleccionado = sel;
+                        btnVerLibros.setDisable(false);
+
+                        if (usuarioLog != null && usuarioLog.getRol() == RolUsuario.ADMINISTRADOR) {
+                            // Admin: CRUD completo menos reservar/cancelar
+                            btnEditarLibros.setDisable(false);
+                            btnBorrarLibros.setDisable(false);
+                            btnReservarLibros .setDisable(true);
+                            btnCancelarReserva.setDisable(true);
+                        } else {
+                            // Usuario normal: puede reservar siempre
+                            btnReservarLibros.setDisable(false);
+                            btnEditarLibros.setDisable(true);
+                            btnBorrarLibros.setDisable(true);
+
+                            boolean tiene = false;
+                            String sql = "SELECT COUNT(*) FROM reserva "
+                                       + "WHERE idUsuario=? AND idLibro=? AND estado='ACTIVO'";
+                            try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+                                ps.setInt(1, usuarioLog.getIdUsuario());
+                                ps.setInt(2, sel.getIdLibro());
+                                ResultSet rs = ps.executeQuery();
+                                if (rs.next() && rs.getInt(1) > 0) {
+                                    tiene = true;
+                                }
+                            } catch (SQLException e) {
+                                System.err.println("Error comprobando reserva: " + e.getMessage());
+                            }
+                            btnCancelarReserva.setDisable(!tiene);
+                        }
+                    }
+                }
+            });
+            
+            // TABLA AUTORES
+            tbvAutores.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2) {
+                    Autor selected = tbvAutores.getSelectionModel().getSelectedItem();
+                    if (selected != null && usuarioLog != null) {
+                        autorSeleccionado = selected;
+                        confBotonesAutores();
+                    }
+                }
+            });
+
+            // TABLA CATEGORIAS
+            tbvCategorias.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2) {
+                    Categoria selected = tbvCategorias.getSelectionModel().getSelectedItem();
+                    if (selected != null) {
+                        categoriaSeleccionado = selected;
+                        confBotonesCategorias();
+                    }
+                }
+            });
+            
+            // TABLA EDITORIALES
+            tbvEditoriales.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2) {
+                    Editorial selected = tbvEditoriales.getSelectionModel().getSelectedItem();
+                    if (selected != null) {
+                        editorialSeleccionado = selected;
+                        confBotonesEditoriales();
+                    }
+                }
+            });
+            
+            // TABLA USUARIOS
+            tbvUsuarios.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2) {
+                    Usuario selected = tbvUsuarios.getSelectionModel().getSelectedItem();
+                    if (selected != null) {
+                        usuarioSeleccionado = selected;
+                        confBotonesUsuario();
+                    }
+                }
+            });
+            
+            //Configuracion botones de add
+            Platform.runLater(() -> {
+                    if(usuarioLog != null && usuarioLog.getRol() == RolUsuario.ADMINISTRADOR) {
+                        btnAddLibros.setDisable(false);
+                        btnAddAutores.setDisable(false);
+                        btnAddCategorias.setDisable(false);
+                        btnAddEditoriales.setDisable(false);
+                    } else {
+                        btnAddLibros.setDisable(true);
+                        btnAddAutores.setDisable(true);
+                        btnAddCategorias.setDisable(true);
+                        btnAddEditoriales.setDisable(true);
+                    }
+                });
+
+        } catch (SQLException ex) {
+            System.err.println("Error en initialize: " + ex.getMessage());
+        }
+    }
+    
+
+    
+
+       
+    /*
+        BOTONES APARTADO LIBRO
+                                    */
+    
+    
+    @FXML
+    void btnAccionEditarLibros(ActionEvent event) throws IOException {        
+        abrirVentanaLibro(new OperacionLibro(Modo.EDITAR, libroSeleccionado),"Editar");
+    }
+    
+    @FXML
+    void btnAccionVerLibros(ActionEvent event) throws IOException {        
+        abrirVentanaLibro(new OperacionLibro(Modo.VER, libroSeleccionado),"Ver");
+    }
+
+    @FXML
+    void btnAccionAddLibros(ActionEvent event) throws IOException {
+        abrirVentanaLibro(new OperacionLibro(Modo.ADD, null),"Añadir");
+    }
+    
+    @FXML
+    void btnAccionBorrarLibros(ActionEvent event) {
+        eliminarLibro();
+    }
+    
+    public void abrirVentanaLibro(OperacionLibro operacion, String titulo) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/designerLibro.fxml"));
+        Parent root = loader.load();
+
+        ControladorLibro controladorLibro = loader.getController();
+        controladorLibro.setControladorMain(this);
+        controladorLibro.setOperacion(operacion);
+        
+        Stage stage = new Stage();
+        stage.setTitle(titulo + " libro");
+        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+    }
+    
+    private void eliminarLibro() {
+        try {
+            // Verificar que hay un libro seleccionado
+            if (libroSeleccionado == null) {
+                mostrarAlertaError("Error", "No hay ningún libro seleccionado para eliminar");
+                return;
+            }
+
+            int idLibro = libroSeleccionado.getIdLibro();
+
+            // Comprobar si tiene reservas activas
+            if (tieneReservas(idLibro)) {
+                mostrarAlertaError("No permitido", "Este libro no puede ser eliminado porque tiene reservas asociadas.");
+                
+                return;
+            }
+
+            // Comprobar si tiene autores asociados
+            if (tieneAutoresRelacionados(idLibro)) {
+                mostrarAlertaError("No permitido", "Este libro no puede ser eliminado porque está relacionado con uno o más autores.");
+                return;
+            }
+        
+            // Confirmación del usuario
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el libro?");
+            confirmacion.setContentText("Esta acción no se puede deshacer.");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                // Ejecutar eliminación
+                String query = "DELETE FROM libro WHERE idLibro = ?";
+                try (PreparedStatement pst = conexion.prepareStatement(query)) {
+                    pst.setInt(1, idLibro);
+
+                    int filasAfectadas = pst.executeUpdate();
+                    if (filasAfectadas > 0) {
+                        mostrarAlertaExito("Éxito", "Libro eliminado correctamente");
+                        tbvLibros.setItems(listaTodosLibros());
+
+                        // Cerrar la ventana actual
+                        
+                    } else {
+                        mostrarAlertaError("Error", "No se pudo eliminar el libro");
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
+    }
+
+    
+    private boolean tieneReservas(int idLibro) throws SQLException {
+        String query = "SELECT COUNT(*) AS total FROM reserva WHERE idLibro = ?";
+        try (PreparedStatement pst = conexion.prepareStatement(query)) {
+            pst.setInt(1, idLibro);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total") > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean tieneAutoresRelacionados(int idLibro) throws SQLException {
+        String query = "SELECT COUNT(*) AS total FROM libro_Autor WHERE idLibro = ?";
+        try (PreparedStatement pst = conexion.prepareStatement(query)) {
+            pst.setInt(1, idLibro);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total") > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    
+    public void mostrarAlertaExito(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+    
+    private void mostrarAlertaError(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+    
+    /*
+        BOTONES APARTADO AUTORES
+                                    */
+    
+    
+    @FXML
+    void btnAccionEditarAutores(ActionEvent event) throws IOException {
+        abrirVentanaAutor(new OperacionAutor(Modo.EDITAR, autorSeleccionado),"Editar");
+    }
+    
+    @FXML
+    void btnAccionVerAutores(ActionEvent event) throws IOException {
+        abrirVentanaAutor(new OperacionAutor(Modo.VER, autorSeleccionado),"Ver");
+    }
+
+    @FXML
+    void btnAccionAddAutores(ActionEvent event) throws IOException {
+        abrirVentanaAutor(new OperacionAutor(Modo.ADD, null),"Añadir");
+    }
+
+    @FXML
+    void btnAccionBorrarAutores(ActionEvent event) {
+
+    }
+
+    public void abrirVentanaAutor(OperacionAutor operacion, String titulo) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/designerAutor.fxml"));
+        Parent root = loader.load();
+
+        ControladorAutor controladorAutor = loader.getController();
+        controladorAutor.setControladorMain(this);
+        controladorAutor.setOperacion(operacion);
+        
+        Stage stage = new Stage();
+        stage.setTitle(titulo + " autor");
+        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+    }
+    
+    /*
+        BOTONES APARTADO EDITORIALES
+                                    */
+    
+    
+    @FXML
+    void btnAccionEditarEditoriales(ActionEvent event) throws IOException {        
+        abrirVentanaEditorial(new OperacionEditorial(Modo.EDITAR, editorialSeleccionado),"Editar");
+    }
+    
+    @FXML
+    void btnAccionVerEditoriales(ActionEvent event) throws IOException {
+        abrirVentanaEditorial(new OperacionEditorial(Modo.VER, editorialSeleccionado),"Ver");
+    }
+    
+    @FXML
+    void btnAccionAddEditoriales(ActionEvent event) throws IOException {
+        abrirVentanaEditorial(new OperacionEditorial(Modo.ADD, editorialSeleccionado),"Añadir");
+    }
+
+    @FXML
+    void btnAccionBorrarEditoriales(ActionEvent event) {
+
+    }
+    public void abrirVentanaEditorial(OperacionEditorial operacion, String titulo) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/designerEditorial.fxml"));
+        Parent root = loader.load();
+
+        ControladorEditorial controladorEditorial = loader.getController();
+        controladorEditorial.setControladorMain(this);
+        controladorEditorial.setOperacion(operacion);
+        
+        Stage stage = new Stage();
+        stage.setTitle(titulo + " editorial");
+        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+    }
+    
+    /*
+        BOTONES APARTADO CATEGORIAS
+                                    */
+    
+    
+    @FXML
+    void btnAccionEditarCategorias(ActionEvent event) {
+
+    }
+    @FXML
+    void btnAccionVerCategorias(ActionEvent event) {
+
+    }
+    
+    @FXML
+    void btnAccionAddCategorias(ActionEvent event) {
+
+    }
+    @FXML
+    void btnAccionBorrarCategorias(ActionEvent event) {
+
+    }
+    
+    /*
+        BOTONES APARTADO USUARIOS
+                                    */
+    
+    
+    
+    @FXML
+    void btnAccionEditarUsuarios(ActionEvent event) throws IOException {
+        abrirVentanaUsuario(new OperacionUsuario(Modo.EDITAR, usuarioSeleccionado),"Editar");
+    }
+    
+    @FXML
+    void btnAccionVerUsuarios(ActionEvent event) throws IOException {
+        abrirVentanaUsuario(new OperacionUsuario(Modo.VER, usuarioSeleccionado),"Ver");
+    }
+    @FXML
+    void btnAccionAddUsuarios(ActionEvent event) throws IOException {
+        abrirVentanaUsuario(new OperacionUsuario(Modo.ADD, usuarioSeleccionado),"Añadir");
+    }
+
+    @FXML
+    void btnAccionBorrarUsuarios(ActionEvent event) {
+
+    }
+    public void abrirVentanaUsuario(OperacionUsuario operacion, String titulo) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/designerUsuario.fxml"));
+        Parent root = loader.load();
+
+        ControladorUsuario controladorUsuario = loader.getController();
+        controladorUsuario.setControladorMain(this);
+        controladorUsuario.setOperacion(operacion);
+        
+        Stage stage = new Stage();
+        stage.setTitle(titulo + " usuario");
+        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+    }
+    
+    //BOTONES RESERVA
+
+    @FXML
+    void btnAccionReservarLibros(ActionEvent event) {
+        reservarLibroConConfirmacion(libroSeleccionado);
+    }
+    
+            
+    @FXML
+    void btnAccionCancelarReserva(ActionEvent event) {
+        cancelarReservaDeLibroSeleccionado();
+    }
+    
+    
+    public void reservarLibroConConfirmacion(Libro libroSeleccionado) {
+        if (libroSeleccionado == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Reserva");
+            alert.setHeaderText(null);
+            alert.setContentText("Debes seleccionar un libro para reservar.");
+            alert.showAndWait();
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar reserva");
+        confirmacion.setHeaderText("¿Deseas reservar el libro?");
+        confirmacion.setContentText("Libro: " + libroSeleccionado.getTitulo());
+
+        Optional<ButtonType> resultado = confirmacion.showAndWait();
+        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+            // Verificar reserva duplicada
+            String checkReservaSQL = "SELECT COUNT(*) FROM reserva "
+                                   + "WHERE idUsuario = ? AND idLibro = ? AND estado = 'ACTIVO'";
+
+            try {
+                conexion.setAutoCommit(false);
+
+                try (PreparedStatement psCheck = conexion.prepareStatement(checkReservaSQL)) {
+                    psCheck.setInt(1, usuarioLog.getIdUsuario());
+                    psCheck.setInt(2, libroSeleccionado.getIdLibro());
+                    ResultSet rs = psCheck.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        conexion.rollback();
+                        Alert dup = new Alert(Alert.AlertType.ERROR);
+                        dup.setTitle("Error en reserva");
+                        dup.setHeaderText("Reserva duplicada");
+                        dup.setContentText("Ya tienes una reserva activa para este libro.");
+                        dup.showAndWait();
+                        return;
+                    }
+                }
+
+                // Verificar copias disponibles
+                if (libroSeleccionado.getCopiasDisponibles() <= 0) {
+                    conexion.rollback();
+                    Alert sinCopias = new Alert(Alert.AlertType.ERROR);
+                    sinCopias.setTitle("Sin copias disponibles");
+                    sinCopias.setHeaderText("No se puede completar la reserva.");
+                    sinCopias.setContentText("No hay copias disponibles de: " + libroSeleccionado.getTitulo());
+                    sinCopias.showAndWait();
+                    return;
+                }
+
+                // --- Aquí cambiamos a INTERVAL 2 WEEK ---
+                String insertReservaSQL = "INSERT INTO reserva "
+                                       + "(idUsuario, idLibro, fechaReserva, fechaExpiracion, estado) "
+                                       + "VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 WEEK), 'ACTIVO')";
+                String updateLibroSQL = "UPDATE libro "
+                                      + "SET copiasDisponibles = copiasDisponibles - 1 "
+                                      + "WHERE idLibro = ? AND copiasDisponibles > 0";
+
+                try (PreparedStatement psInsert = conexion.prepareStatement(insertReservaSQL);
+                     PreparedStatement psUpdate = conexion.prepareStatement(updateLibroSQL)) {
+
+                    psInsert.setInt(1, usuarioLog.getIdUsuario());
+                    psInsert.setInt(2, libroSeleccionado.getIdLibro());
+                    psInsert.executeUpdate();
+
+                    psUpdate.setInt(1, libroSeleccionado.getIdLibro());
+                    int rowsAffected = psUpdate.executeUpdate();
+                    if (rowsAffected == 0) {
+                        conexion.rollback();
+                        Alert errorUpd = new Alert(Alert.AlertType.ERROR);
+                        errorUpd.setTitle("Error");
+                        errorUpd.setHeaderText("No se pudo actualizar las copias.");
+                        errorUpd.setContentText("Intenta nuevamente más tarde.");
+                        errorUpd.showAndWait();
+                        return;
+                    }
+
+                    conexion.commit();
+
+                    // Calculamos en Java la fecha de expiración para mostrarla
+                    LocalDate expira = LocalDate.now().plusWeeks(2);
+                    Alert exito = new Alert(Alert.AlertType.INFORMATION);
+                    exito.setTitle("Reserva exitosa");
+                    exito.setHeaderText(null);
+                    exito.setContentText("Reserva realizada con éxito para: " 
+                                         + libroSeleccionado.getTitulo() 
+                                         + "\nLa reserva expirará el: " 
+                                         + expira.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                    exito.showAndWait();
+
+                    // Refrescar vista
+                    tbvLibros.setItems(listaLibrosDisponibles());
+
+                } 
+
+            } catch (SQLException e) {
+                try { conexion.rollback(); } catch (SQLException ex) { /*…*/ }
+                Alert error = new Alert(Alert.AlertType.ERROR);
+                error.setTitle("Error");
+                error.setHeaderText("Fallo en la reserva.");
+                error.setContentText("Detalles: " + e.getMessage());
+                error.showAndWait();
+
+            } finally {
+                try { conexion.setAutoCommit(true); } catch (SQLException e) { /*…*/ }
+            }
+        }
+    }
+
+    private void cancelarReservaDeLibroSeleccionado() {
+        if (libroSeleccionado == null) return;
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Anular reserva");
+        confirm.setHeaderText("¿Seguro que quieres anular la reserva de:");
+        confirm.setContentText(libroSeleccionado.getTitulo());
+
+        Optional<ButtonType> opt = confirm.showAndWait();
+        if (opt.isEmpty() || opt.get() != ButtonType.OK) return;
+
+        String sqlAnular = "UPDATE reserva SET estado = 'INACTIVO' "
+                         + "WHERE idUsuario = ? AND idLibro = ? AND estado = 'ACTIVO'";
+
+        String sqlDevolver = "UPDATE libro SET copiasDisponibles = copiasDisponibles + 1 "
+                          + "WHERE idLibro = ?";
+
+        try {
+            conexion.setAutoCommit(false);
+
+            try (PreparedStatement ps1 = conexion.prepareStatement(sqlAnular);
+                 PreparedStatement ps2 = conexion.prepareStatement(sqlDevolver)) {
+
+                ps1.setInt(1, usuarioLog.getIdUsuario());
+                ps1.setInt(2, libroSeleccionado.getIdLibro());
+                int mod1 = ps1.executeUpdate();
+
+                ps2.setInt(1, libroSeleccionado.getIdLibro());
+                int mod2 = ps2.executeUpdate();
+
+                if (mod1 == 0 || mod2 == 0) {
+                    conexion.rollback();
+                    new Alert(Alert.AlertType.ERROR, 
+                        "No se pudo anular la reserva correctamente.").showAndWait();
+                    return;
+                }
+
+                conexion.commit();
+                new Alert(Alert.AlertType.INFORMATION, 
+                    "Reserva anulada y copia recuperada.").showAndWait();
+
+                // Refrescar tablas
+                if (opcDisponibles.isSelected()) {
+                    tbvLibros.setItems(listaLibrosDisponibles());
+                } else if (opcReservas.isSelected()) {
+                    tbvLibros.setItems(listaLibrosReservados());
+                } else {
+                    tbvLibros.setItems(listaTodosLibros());
+                }
+
+                // Tras la anulación, deshabilitar el botón de nuevo
+                btnReservarLibros.setDisable(true);
+            }
+        } catch (SQLException ex) {
+            try { conexion.rollback(); } catch (SQLException __) { }
+            new Alert(Alert.AlertType.ERROR, 
+                "Error al anular la reserva: " + ex.getMessage()).showAndWait();
+        } finally {
+            try { conexion.setAutoCommit(true); } catch (SQLException __) { }
+        }
+    }
+
+
+
+    @FXML
+    void btnAccionSalir(ActionEvent event) {
+        salir();
+    }
+    
+    
+    public ObservableList<Libro> listaTodosLibros() {
+        ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
+
+        if (conexion != null) {
+            String query = "SELECT * FROM libro";
+            try {
+                rs = st.executeQuery(query);
+                while (rs.next()) {
+                    Libro libro = new Libro(
+                        rs.getInt("idLibro"),
+                        rs.getString("titulo"),
+                        rs.getString("descripcion"),
+                        rs.getString("ISBN"),
+                        rs.getInt("totalCopias"),
+                        rs.getInt("copiasDisponibles"),
+                        rs.getInt("idCategoria"),
+                        rs.getInt("idEditorial")
+                    );
+                    listaLibros.add(libro);
+                }
+            } catch (SQLException e) {
+                System.out.println("Excepción SQL: " + e.getMessage());
+            }
+        }
+
+        return listaLibros;
+    }
+
+    public Connection dameConnection() { 
+        return ConexionSingleton.obtenerConexion();
+    }  
+    
+    
+    public ObservableList<Categoria> listaTodasCategorias() {
+        ObservableList<Categoria> lista = FXCollections.observableArrayList();
+        String query = "SELECT idCategoria, nombreCategoria FROM categoria";
+        try (PreparedStatement pst = conexion.prepareStatement(query);
+             ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(new Categoria(
+                    rs.getInt("idCategoria"),
+                    rs.getString("nombreCategoria")
+                ));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener categorías: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public ObservableList<Editorial> listaTodasEditoriales() {
+        ObservableList<Editorial> lista = FXCollections.observableArrayList();
+        String query = "SELECT idEditorial, nombreEditorial, direccion, telefono FROM editorial";
+        try (PreparedStatement pst = conexion.prepareStatement(query);
+             ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(new Editorial(
+                    rs.getInt("idEditorial"),
+                    rs.getString("nombreEditorial"),
+                    rs.getString("direccion"),
+                    rs.getString("telefono")
+                ));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener editoriales: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    
+    private ObservableList<Libro> listaLibrosDisponibles() {
+        ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
+
+        String query = "SELECT * FROM libro WHERE copiasDisponibles > 0";
+
+        try {
+            Statement st = conexion.createStatement();
+            ResultSet rs = st.executeQuery(query);
+
+            while (rs.next()) {
+                Libro libro = new Libro(
+                    rs.getInt("idLibro"),
+                    rs.getString("titulo"),
+                    rs.getString("descripcion"),
+                    rs.getString("ISBN"),
+                    rs.getInt("totalCopias"),
+                    rs.getInt("copiasDisponibles"),
+                    rs.getInt("idCategoria"),
+                    rs.getInt("idEditorial")
+                );
+                listaLibros.add(libro);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al listar libros disponibles: " + e.getMessage());
+        }
+
+        return listaLibros;
+    }
+
+    
+    private ObservableList<Libro> listaLibrosReservados() {
+        ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
+
+        String query = "SELECT DISTINCT l.* FROM libro l " +
+                       "JOIN reserva r ON l.idLibro = r.idLibro " +
+                       "WHERE r.estado = 'ACTIVO' AND r.idUsuario = ?";
+
+        try {
+            PreparedStatement ps = conexion.prepareStatement(query);
+            ps.setInt(1, usuarioLog.getIdUsuario());
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Libro libro = new Libro(
+                    rs.getInt("idLibro"),
+                    rs.getString("titulo"),
+                    rs.getString("descripcion"),
+                    rs.getString("ISBN"),
+                    rs.getInt("totalCopias"),
+                    rs.getInt("copiasDisponibles"),
+                    rs.getInt("idCategoria"),
+                    rs.getInt("idEditorial")
+                );
+                listaLibros.add(libro);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al listar libros reservados por el usuario: " + e.getMessage());
+        }
+
+        return listaLibros;
+    }
+
+    public ObservableList<Autor> listaTodosAutores() {
+        ObservableList<Autor> listaAutores = FXCollections.observableArrayList();
+
+        String query = "SELECT * FROM autor";
+
+        try (PreparedStatement pst = conexion.prepareStatement(query);
+             ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                Autor autor = new Autor(
+                    rs.getInt("idAutor"),
+                    rs.getString("nombreAutor"),
+                    rs.getString("apellidoAutor"),
+                    rs.getString("nacionalidad"),
+                    rs.getString("imagenAutor"),  // Puede ser null
+                    rs.getString("biografia")
+                );
+                listaAutores.add(autor);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al obtener la lista de autores: " + e.getMessage());
+        }
+
+        return listaAutores;
+    }
+
+
+    public ObservableList<Usuario> listaTodosUsuarios() {
+        ObservableList<Usuario> lista = FXCollections.observableArrayList();
+        String query = "SELECT idUsuario, nombreUsuario, apellidoUsuario, imagenUsuario, "
+                     + "email, `contraseña`, telefono, direccion, rol "
+                     + "FROM usuario";
+
+        try (PreparedStatement pst = conexion.prepareStatement(query);
+             ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                // Recuperar el String de rol y convertirlo al enum
+                String rolStr = rs.getString("rol");
+                RolUsuario rolEnum = RolUsuario.valueOf(rolStr);
+
+                Usuario usuario = new Usuario(
+                    rs.getInt("idUsuario"),
+                    rs.getString("nombreUsuario"),
+                    rs.getString("apellidoUsuario"),
+                    rs.getString("imagenUsuario"),    // puede ser null
+                    rs.getString("email"),
+                    rs.getString("contraseña"),
+                    rs.getString("telefono"),
+                    rs.getString("direccion"),
+                    rolEnum
+                );
+                lista.add(usuario);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener usuarios: " + e.getMessage());
+        }
+
+        return lista;
+    }
+
+
+    
+    private void actualizarInfo(){
+        txtNombreUsuario.setText(usuarioLog.getNombreUsuario());
+        txtEmailUsuario.setText(usuarioLog.getEmail());
+        
+        if (usuarioLog.getIdUsuario() != 1) {
+            tabUsuarios.setDisable(true);
+        }else{
+            opcReservas.setDisable(true);
+            
+        }
+        
+    }
+
+    public void procesarReservasExpiradas() {
+        String sql = 
+            "UPDATE libro l " +
+            "JOIN reserva r ON l.idLibro = r.idLibro " +
+            "SET " +
+            "  l.copiasDisponibles = l.copiasDisponibles + 1, " +
+            "  r.estado = 'INACTIVO' " +
+            "WHERE " +
+            "  r.estado = 'ACTIVO' " +
+            "  AND r.fechaExpiracion < CURDATE()";
+        try (Statement st = conexion.createStatement()) {
+            int filas = st.executeUpdate(sql);
+            System.out.println("Reservas expiradas procesadas: " + filas);
+        } catch (SQLException e) {
+            System.err.println("Error procesando expiración de reservas: " + e.getMessage());
+        }
+    }
+ 
+    public void eliminarReservasMuyAntiguas() {
+        String sql = 
+            "DELETE FROM reserva " +
+            "WHERE estado = 'INACTIVO' " +
+            "  AND fechaExpiracion < DATE_SUB(CURDATE(), INTERVAL 2 WEEK)";
+        try (Statement st = conexion.createStatement()) {
+            int filasBorradas = st.executeUpdate(sql);
+            System.out.println("Reservas muy antiguas eliminadas: " + filasBorradas);
+        } catch (SQLException e) {
+            System.err.println("Error eliminando reservas antiguas: " + e.getMessage());
+        }
+    }
+    
+    public void confBotonesAutores(){
+        btnVerAutores.setDisable(false); // Siempre visible
+
+        if (usuarioLog.getRol() == RolUsuario.ADMINISTRADOR) {
+            btnEditarAutores.setDisable(false);
+            btnBorrarAutores.setDisable(false);
+        } else {
+            btnEditarAutores.setDisable(true);
+            btnBorrarAutores.setDisable(true);
+        }
+    }
+    public void confBotonesCategorias() {
+        btnVerCategorias.setDisable(false); // Siempre visible
+
+        if (usuarioLog.getRol() == RolUsuario.ADMINISTRADOR) {
+            btnEditarCategorias.setDisable(false);
+            btnBorrarCategorias.setDisable(false);
+        } else {
+            btnEditarCategorias.setDisable(true);
+            btnBorrarCategorias.setDisable(true);
+        }
+    }
+
+    public void confBotonesEditoriales() {
+        btnVerEditoriales.setDisable(false); // Siempre visible
+
+        if (usuarioLog.getRol() == RolUsuario.ADMINISTRADOR) {
+            btnEditarEditoriales.setDisable(false);
+            btnBorrarEditoriales.setDisable(false);
+        } else {
+            btnEditarEditoriales.setDisable(true);
+            btnBorrarEditoriales.setDisable(true);
+        }
+    }
+
+    public void confBotonesUsuario(){
+        btnEditarUsuarios.setDisable(false);
+        btnVerUsuarios.setDisable(false);
+        btnBorrarUsuarios.setDisable(false);
+    }
+
+    public void resetearBotonesLibros() {
+        boolean isAdmin = usuarioLog != null && usuarioLog.getRol() == RolUsuario.ADMINISTRADOR;
+        // Si es admin, btnAddLibros queda habilitado; si no, deshabilitado.
+        // El resto siempre se deshabilita al resetear
+        btnEditarLibros   .setDisable(true);
+        btnBorrarLibros   .setDisable(true);
+        btnVerLibros      .setDisable(true);
+        btnReservarLibros .setDisable(true);
+        btnCancelarReserva.setDisable(true);
+    }
+
+    public void setUsuarioLog(Usuario usuario) {
+        this.usuarioLog = usuario;
+
+        opcTodosLibros.setSelected(true);
+        tbvLibros.setItems(listaTodosLibros());
+
+        resetearBotonesLibros();
+    }
+
+    
+    public void recibirUsuarioLogin(Usuario us){
+        usuarioLog = us;
+        actualizarInfo();
+    }
+    
+    public void configurarFiltros(){
+        txtFldLibro.textProperty().addListener((observable, oldValue, newValue) -> {
+            filtrarLibros(newValue);
+        });
+        
+        txtFldAutor.textProperty().addListener((observable, oldValue, newValue) -> {
+            filtrarAutor(newValue);
+        });
+        
+        txtFldEditorial.textProperty().addListener((observable, oldValue, newValue) -> {
+            filtrarEditorial(newValue);
+        });
+        
+        txtFldCategoria.textProperty().addListener((observable, oldValue, newValue) -> {
+            filtrarCategoria(newValue);
+        });
+        
+        txtFldUsuario.textProperty().addListener((observable, oldValue, newValue) -> {
+            filtrarUsuario(newValue);
+        });
+    }
+    
+    private void filtrarLibros(String criterio) {
+        opcTodosLibros.setSelected(true);
+        ObservableList<Libro> listaCompleta = listaTodosLibros();
+
+        FilteredList<Libro> listaFiltrada = new FilteredList<>(listaCompleta, libro -> {
+            if (criterio == null || criterio.isEmpty()) {
+                return true; 
+            }
+            String criterioEnMinusculas = criterio.toLowerCase();
+
+            return libro.getTitulo().toLowerCase().contains(criterioEnMinusculas);
+        });
+
+        tbvLibros.setItems(listaFiltrada);
+    }
+    
+    private void filtrarAutor(String criterio) {
+        ObservableList<Autor> listaCompleta = listaTodosAutores();
+
+        FilteredList<Autor> listaFiltrada = new FilteredList<>(listaCompleta, autor -> {
+            if (criterio == null || criterio.isEmpty()) {
+                return true; 
+            }
+            String criterioEnMinusculas = criterio.toLowerCase();
+
+            return autor.getNombreAutor().toLowerCase().contains(criterioEnMinusculas);
+        });
+
+        tbvAutores.setItems(listaFiltrada);
+    }
+    
+    private void filtrarEditorial(String criterio) {
+        ObservableList<Editorial> listaCompleta = listaTodasEditoriales();
+
+        FilteredList<Editorial> listaFiltrada = new FilteredList<>(listaCompleta, editorial -> {
+            if (criterio == null || criterio.isEmpty()) {
+                return true; 
+            }
+            String criterioEnMinusculas = criterio.toLowerCase();
+
+            return editorial.getNombreEditorial().toLowerCase().contains(criterioEnMinusculas);
+        });
+
+        tbvEditoriales.setItems(listaFiltrada);
+    }
+    
+    private void filtrarCategoria(String criterio) {
+        ObservableList<Categoria> listaCompleta = listaTodasCategorias();
+
+        FilteredList<Categoria> listaFiltrada = new FilteredList<>(listaCompleta, categoria -> {
+            if (criterio == null || criterio.isEmpty()) {
+                return true; 
+            }
+            String criterioEnMinusculas = criterio.toLowerCase();
+
+            return categoria.getNombreCategoria().toLowerCase().contains(criterioEnMinusculas);
+        });
+
+        tbvCategorias.setItems(listaFiltrada);
+    }
+    
+    private void filtrarUsuario(String criterio) {
+        ObservableList<Usuario> listaCompleta = listaTodosUsuarios();
+
+        FilteredList<Usuario> listaFiltrada = new FilteredList<>(listaCompleta, usuario -> {
+            if (criterio == null || criterio.isEmpty()) {
+                return true; 
+            }
+            String criterioEnMinusculas = criterio.toLowerCase();
+
+            return usuario.getNombreUsuario().toLowerCase().contains(criterioEnMinusculas);
+        });
+
+        tbvUsuarios.setItems(listaFiltrada);
+    }
+    
+    private void relacionarColumnas(){
+        //Tabla Libros
+        colISBNLibros.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
+        colTituloLibros.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+        colCopiasDisponiblesLibros.setCellValueFactory(new PropertyValueFactory<>("copiasDisponibles"));
+        colTotalCopiasLibros.setCellValueFactory(new PropertyValueFactory<>("totalCopias"));
+        
+        //Tabla Autor
+        colNombreAutores.setCellValueFactory(new PropertyValueFactory<>("nombreAutor"));
+        colApellidoAutores.setCellValueFactory(new PropertyValueFactory<>("apellidosAutor"));
+        colNacionalidadAutores.setCellValueFactory(new PropertyValueFactory<>("nacionalidad"));
+        
+        //Tabla Editorial
+        colIdEditoriales.setCellValueFactory(new PropertyValueFactory<>("idEditorial"));
+        colNombreEditoriales.setCellValueFactory(new PropertyValueFactory<>("nombreEditorial"));
+        colDireccionEditoriales.setCellValueFactory(new PropertyValueFactory<>("direccion"));
+        colTelefonoEditoriales.setCellValueFactory(new PropertyValueFactory<>("telefono"));
+        
+        //Tabla Categoria
+        colIdCategorias.setCellValueFactory(new PropertyValueFactory<>("idCategoria"));
+        colNombreCategorias.setCellValueFactory(new PropertyValueFactory<>("nombreCategoria"));
+        
+        //Tabla Usuarios
+        colNombreUsuarios.setCellValueFactory(new PropertyValueFactory<>("nombreUsuario"));
+        colApellidosUsuarios.setCellValueFactory(new PropertyValueFactory<>("apellidoUsuario"));
+        colEmailUsuarios.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colTelefonoUsuarios.setCellValueFactory(new PropertyValueFactory<>("telefono"));
+        colDireccionUsuarios.setCellValueFactory(new PropertyValueFactory<>("direccion"));
+        
+    }
+    
+    private void inicializarImagenes(){
+        //Img Salida
+        imgSalir.setImage(new Image(getClass().getClassLoader().getResourceAsStream("salir.png")));
+        
+        //Img apartado Libros:        
+        imgLupaLibro.setImage(new Image(getClass().getClassLoader().getResourceAsStream("lupa.png")));
+        imgVerLibro.setImage(new Image(getClass().getClassLoader().getResourceAsStream("ver.png")));
+        imgEditarLibro.setImage(new Image(getClass().getClassLoader().getResourceAsStream("editar.png")));
+        imgAddLibro.setImage(new Image(getClass().getClassLoader().getResourceAsStream("add.png")));
+        imgBorrarLibro.setImage(new Image(getClass().getClassLoader().getResourceAsStream("borrar.png")));
+
+
+        //Img apartado Autores
+        imgLupaAutor.setImage(new Image(getClass().getClassLoader().getResourceAsStream("lupa.png")));
+        imgVerAutor.setImage(new Image(getClass().getClassLoader().getResourceAsStream("ver.png")));
+        imgEditarAutor.setImage(new Image(getClass().getClassLoader().getResourceAsStream("editar.png")));
+        imgAddAutor.setImage(new Image(getClass().getClassLoader().getResourceAsStream("add.png")));
+        imgBorrarAutor.setImage(new Image(getClass().getClassLoader().getResourceAsStream("borrar.png")));
+        
+        
+        //Img apartado Editoriales
+        imgLupaEditorial.setImage(new Image(getClass().getClassLoader().getResourceAsStream("lupa.png")));
+        imgVerEditorial.setImage(new Image(getClass().getClassLoader().getResourceAsStream("ver.png")));
+        imgEditarEditorial.setImage(new Image(getClass().getClassLoader().getResourceAsStream("editar.png")));
+        imgAddEditorial.setImage(new Image(getClass().getClassLoader().getResourceAsStream("add.png")));
+        imgBorrarEditorial.setImage(new Image(getClass().getClassLoader().getResourceAsStream("borrar.png")));
+        
+        
+        //Img apartado Categorias
+        imgLupaCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("lupa.png")));
+        imgVerCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("ver.png")));
+        imgEditarCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("editar.png")));
+        imgAddCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("add.png")));
+        imgBorrarCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("borrar.png")));
+        
+        
+        //Img apartado Usuarios
+        imgLupaUsuario.setImage(new Image(getClass().getClassLoader().getResourceAsStream("lupa.png")));
+        imgVerUsuario.setImage(new Image(getClass().getClassLoader().getResourceAsStream("ver.png")));
+        imgEditarUsuario.setImage(new Image(getClass().getClassLoader().getResourceAsStream("editar.png")));
+        imgAddUsuario.setImage(new Image(getClass().getClassLoader().getResourceAsStream("add.png")));
+        imgBorrarUsuario.setImage(new Image(getClass().getClassLoader().getResourceAsStream("borrar.png")));
+        
+    }
+    
+    
+    public void salir() {
+        Platform.runLater(() -> {
+            System.exit(0);
+        });
+    }
+    
+}
