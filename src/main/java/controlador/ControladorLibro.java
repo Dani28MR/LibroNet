@@ -255,7 +255,7 @@ public class ControladorLibro implements Initializable{
         cMain.tbvLibros.setItems(cMain.listaTodosLibros());
     }
 
-    // Métodos auxiliares
+    
     public void mostrarAlertaExito(String titulo, String mensaje) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle(titulo);

@@ -328,14 +328,6 @@
                                           <ImageView fx:id="imgVerCategoria" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
                                        </graphic>
                                     </Button>
-                                    <Button fx:id="btnEditarCategorias" contentDisplay="TOP" disable="true" onAction="#btnAccionEditarCategorias" text="_Editar">
-                                       <VBox.margin>
-                                          <Insets top="15.0" />
-                                       </VBox.margin>
-                                       <graphic>
-                                          <ImageView fx:id="imgEditarCategoria" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
-                                       </graphic>
-                                    </Button>
                                  </children>
                               </VBox>
                               <VBox prefHeight="333.0" prefWidth="920.0">

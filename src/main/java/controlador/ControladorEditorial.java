@@ -3,6 +3,7 @@ package controlador;
 
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,11 +12,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import modelo.Editorial;
+import static modelo.Modo.ADD;
 import static modelo.Modo.EDITAR;
 import static modelo.Modo.VER;
 import modelo.OperacionEditorial;
@@ -51,7 +54,14 @@ public class ControladorEditorial implements Initializable {
     
     @FXML
     void btnAccionAceptar(ActionEvent event) {
-
+        switch (operacion.modo()) {
+            case ADD -> {
+                crearNuevaEditorial();
+            }
+            case EDITAR -> {
+                editarEditorial();
+            }
+        }
     }
 
     @FXML
@@ -73,7 +83,7 @@ public class ControladorEditorial implements Initializable {
     
     public void setControladorMain(ControladorMain cMain) {
         this.cMain = cMain;
-        initDatos(); // 🔑 Llama a initDatos() después de asignar cMain
+        initDatos();
     }
     public void setOperacion(OperacionEditorial operacion) {
         this.operacion = operacion;
@@ -107,7 +117,119 @@ public class ControladorEditorial implements Initializable {
         txtDireccion.setText(editorialSeleccionado.getDireccion());
         txtTelefono.setText(editorialSeleccionado.getTelefono());
     }
+    private void crearNuevaEditorial() {
+        String nombre = txtNombre.getText().trim();
+        String direccion = txtDireccion.getText().trim();
+        String telefono = txtTelefono.getText().trim();
+
+        if (nombre.isEmpty() || direccion.isEmpty() || telefono.isEmpty()) {
+            mostrarAlertaError(
+                "Error de validación",
+                "Todos los campos (Nombre, Dirección y Teléfono) son obligatorios y no pueden quedar vacíos."
+            );
+            return;
+        }
+
+        try {
+            String queryCheck = "SELECT COUNT(*) FROM editorial WHERE nombreEditorial = ?";
+            try (PreparedStatement pstCheck = conexion.prepareStatement(queryCheck)) {
+                pstCheck.setString(1, nombre);
+                ResultSet rs = pstCheck.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    mostrarAlertaError(
+                        "Ya existe esa editorial",
+                        "No se ha creado la nueva editorial porque ya existe una con el nombre \"" + nombre + "\"."
+                    );
+                    return;
+                }
+            }
+
+            String queryInsert = "INSERT INTO editorial (nombreEditorial, direccion, telefono) VALUES (?, ?, ?)";
+            try (PreparedStatement pstIns = conexion.prepareStatement(queryInsert)) {
+                pstIns.setString(1, nombre);
+                pstIns.setString(2, direccion);
+                pstIns.setString(3, telefono);
+
+                int filas = pstIns.executeUpdate();
+                if (filas > 0) {
+                    mostrarAlertaExito("Éxito", "Editorial creada correctamente");
+                } else {
+                    mostrarAlertaError("Error", "No se pudo crear la editorial");
+                }
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
+
+        cMain.tbvEditoriales.setItems(cMain.listaTodasEditoriales());
+    }
     
+    private void editarEditorial() {
+
+        String nombre    = txtNombre.getText().trim();
+        String direccion = txtDireccion.getText().trim();
+        String telefono  = txtTelefono.getText().trim();
+
+        if (nombre.isEmpty() || direccion.isEmpty() || telefono.isEmpty()) {
+            mostrarAlertaError(
+                "Error de validación",
+                "Todos los campos (Nombre, Dirección y Teléfono) son obligatorios y no pueden quedar vacíos."
+            );
+            return;
+        }
+
+        int idEditorial = editorialSeleccionado.getIdEditorial();
+
+        try {
+            String queryUpdate =
+                "UPDATE editorial " +
+                "SET nombreEditorial = ?, direccion = ?, telefono = ? " +
+                "WHERE idEditorial = ?";
+
+            try (PreparedStatement pst = conexion.prepareStatement(queryUpdate)) {
+                pst.setString(1, nombre);
+                pst.setString(2, direccion);
+                pst.setString(3, telefono);
+                pst.setInt(4, idEditorial);
+
+                int filasAfectadas = pst.executeUpdate();
+                if (filasAfectadas > 0) {
+                    mostrarAlertaExito("Éxito", "Editorial modificada correctamente.");
+                } else {
+                    mostrarAlertaError(
+                        "Error",
+                        "No se pudo encontrar la editorial con ID = " + idEditorial + "."
+                    );
+                }
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
+
+        cMain.tbvEditoriales.setItems(cMain.listaTodasEditoriales());
+    }
+
+
+    private void mostrarAlertaExito(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+        
+        Stage stage = (Stage) btnAceptar.getScene().getWindow();
+        stage.close();
+    }
+
+    private void mostrarAlertaError(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
     
     private void cerrarVentana(ActionEvent event){
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

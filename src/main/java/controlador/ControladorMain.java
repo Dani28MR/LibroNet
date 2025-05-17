@@ -44,6 +44,7 @@ import modelo.Editorial;
 import modelo.Libro;
 import modelo.Modo;
 import modelo.OperacionAutor;
+import modelo.OperacionCategoria;
 import modelo.OperacionEditorial;
 import modelo.OperacionLibro;
 import modelo.OperacionUsuario;
@@ -84,9 +85,6 @@ public class ControladorMain implements Initializable{
 
     @FXML
     private Button btnEditarAutores;
-
-    @FXML
-    private Button btnEditarCategorias;
 
     @FXML
     private Button btnEditarEditoriales;
@@ -193,8 +191,6 @@ public class ControladorMain implements Initializable{
     @FXML
     private ImageView imgEditarAutor;
 
-    @FXML
-    private ImageView imgEditarCategoria;
 
     @FXML
     private ImageView imgEditarEditorial;
@@ -269,19 +265,19 @@ public class ControladorMain implements Initializable{
     private TableColumn<Usuario, String> colDireccionUsuarios;
 
     @FXML
-    private TableView<Autor> tbvAutores;
+    public TableView<Autor> tbvAutores;
 
     @FXML
-    private TableView<Categoria> tbvCategorias;
+    public TableView<Categoria> tbvCategorias;
 
     @FXML
-    private TableView<Editorial> tbvEditoriales;
+    public TableView<Editorial> tbvEditoriales;
 
     @FXML
     public TableView<Libro> tbvLibros;
 
     @FXML
-    private TableView<Usuario> tbvUsuarios;
+    public TableView<Usuario> tbvUsuarios;
 
     @FXML
     private Label txtEmailUsuario;
@@ -459,9 +455,6 @@ public class ControladorMain implements Initializable{
         }
     }
     
-
-    
-
        
     /*
         BOTONES APARTADO LIBRO
@@ -658,12 +651,12 @@ public class ControladorMain implements Initializable{
     
     @FXML
     void btnAccionAddEditoriales(ActionEvent event) throws IOException {
-        abrirVentanaEditorial(new OperacionEditorial(Modo.ADD, editorialSeleccionado),"Añadir");
+        abrirVentanaEditorial(new OperacionEditorial(Modo.ADD, null),"Añadir");
     }
 
     @FXML
     void btnAccionBorrarEditoriales(ActionEvent event) {
-
+        eliminarEditorial();
     }
     public void abrirVentanaEditorial(OperacionEditorial operacion, String titulo) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/designerEditorial.fxml"));
@@ -680,35 +673,145 @@ public class ControladorMain implements Initializable{
         stage.showAndWait();
     }
     
+    private void eliminarEditorial() {
+        try {
+            if (editorialSeleccionado == null) {
+                mostrarAlertaError("Error", "No hay ninguna editorial seleccionada para eliminar");
+                return;
+            }
+
+            int idEditorial = editorialSeleccionado.getIdEditorial();
+
+            String sqlCheck = "SELECT COUNT(*) FROM libro WHERE idEditorial = ?";
+            try (PreparedStatement pstCheck = conexion.prepareStatement(sqlCheck)) {
+                pstCheck.setInt(1, idEditorial);
+                ResultSet rs = pstCheck.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    mostrarAlertaError(
+                        "No permitido",
+                        "Esta editorial no puede ser eliminada porque hay uno o más libros asociados a ella."
+                    );
+                    return;
+                }
+            }
+
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar la editorial?");
+            confirmacion.setContentText("¡Esta acción no se puede deshacer!");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                String sqlDelete = "DELETE FROM editorial WHERE idEditorial = ?";
+                try (PreparedStatement pstDel = conexion.prepareStatement(sqlDelete)) {
+                    pstDel.setInt(1, idEditorial);
+                    int filasAfectadas = pstDel.executeUpdate();
+
+                    if (filasAfectadas > 0) {
+                        mostrarAlertaExito("Éxito", "Editorial eliminada correctamente");
+                        tbvEditoriales.setItems(listaTodasEditoriales());
+                    } else {
+                        mostrarAlertaError("Error", "No se pudo eliminar la editorial");
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
+    }
+
+    
     /*
         BOTONES APARTADO CATEGORIAS
                                     */
     
-    
     @FXML
-    void btnAccionEditarCategorias(ActionEvent event) {
-
-    }
-    @FXML
-    void btnAccionVerCategorias(ActionEvent event) {
-
+    void btnAccionVerCategorias(ActionEvent event) throws IOException {
+        abrirVentanaCategoria(new OperacionCategoria(Modo.VER,categoriaSeleccionado), "Ver");
     }
     
     @FXML
-    void btnAccionAddCategorias(ActionEvent event) {
-
+    void btnAccionAddCategorias(ActionEvent event)  throws IOException{
+        abrirVentanaCategoria(new OperacionCategoria(Modo.ADD,null), "Ver");
     }
     @FXML
     void btnAccionBorrarCategorias(ActionEvent event) {
-
+        eliminarCategoria();
     }
+    
+    public void abrirVentanaCategoria(OperacionCategoria operacion, String titulo) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/designerCategoria.fxml"));
+        Parent root = loader.load();
+
+        ControladorCategoria controladorCategoria = loader.getController();
+        controladorCategoria.setControladorMain(this);
+        controladorCategoria.setOperacion(operacion);
+        
+        Stage stage = new Stage();
+        stage.setTitle(titulo + " categoria");
+        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+    }
+    
+    private void eliminarCategoria() {
+        try {
+            // 1. Verificar que hay una categoría seleccionada
+            if (categoriaSeleccionado == null) {
+                mostrarAlertaError("Error", "No hay ninguna categoría seleccionada para eliminar");
+                return;
+            }
+
+            int idCategoria = categoriaSeleccionado.getIdCategoria();
+
+            // 2. Comprobar si existen libros asociados a esta categoría
+            String sqlCheck = "SELECT COUNT(*) FROM libro WHERE idCategoria = ?";
+            try (PreparedStatement pstCheck = conexion.prepareStatement(sqlCheck)) {
+                pstCheck.setInt(1, idCategoria);
+                ResultSet rs = pstCheck.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    mostrarAlertaError(
+                        "No permitido",
+                        "Esta categoría no puede ser eliminada porque hay uno o más libros asociados a ella."
+                    );
+                    return;
+                }
+            }
+
+            // 3. Confirmación del usuario
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar la categoría?");
+            confirmacion.setContentText("¡Esta acción no se puede deshacer!");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                // 4. Ejecutar eliminación
+                String sqlDelete = "DELETE FROM categoria WHERE idCategoria = ?";
+                try (PreparedStatement pstDel = conexion.prepareStatement(sqlDelete)) {
+                    pstDel.setInt(1, idCategoria);
+                    int filasAfectadas = pstDel.executeUpdate();
+
+                    if (filasAfectadas > 0) {
+                        mostrarAlertaExito("Éxito", "Categoría eliminada correctamente");
+                        // 5. Refrescar la tabla de categorías
+                        tbvCategorias.setItems(listaTodasCategorias());
+                    } else {
+                        mostrarAlertaError("Error", "No se pudo eliminar la categoría");
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
+    }
+    
     
     /*
         BOTONES APARTADO USUARIOS
                                     */
-    
-    
-    
     @FXML
     void btnAccionEditarUsuarios(ActionEvent event) throws IOException {
         abrirVentanaUsuario(new OperacionUsuario(Modo.EDITAR, usuarioSeleccionado),"Editar");
@@ -1193,10 +1296,8 @@ public class ControladorMain implements Initializable{
         btnVerCategorias.setDisable(false); // Siempre visible
 
         if (usuarioLog.getRol() == RolUsuario.ADMINISTRADOR) {
-            btnEditarCategorias.setDisable(false);
             btnBorrarCategorias.setDisable(false);
         } else {
-            btnEditarCategorias.setDisable(true);
             btnBorrarCategorias.setDisable(true);
         }
     }
@@ -1405,7 +1506,6 @@ public class ControladorMain implements Initializable{
         //Img apartado Categorias
         imgLupaCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("lupa.png")));
         imgVerCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("ver.png")));
-        imgEditarCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("editar.png")));
         imgAddCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("add.png")));
         imgBorrarCategoria.setImage(new Image(getClass().getClassLoader().getResourceAsStream("borrar.png")));
         
