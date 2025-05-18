@@ -357,6 +357,8 @@ public class ControladorMain implements Initializable{
     private Editorial editorialSeleccionado;
     private Categoria categoriaSeleccionado;
     private Usuario usuarioSeleccionado;
+    private Usuario usuarioSeleccionadoReserva;
+    private Libro libroSeleccionadoReserva;
     
     
     @Override
@@ -495,13 +497,26 @@ public class ControladorMain implements Initializable{
                         btnAddCategorias.setDisable(true);
                         btnAddEditoriales.setDisable(true);
                     }
-                });
+            });
+            
+            
+            tbvUsuarioReserva.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+                usuarioSeleccionadoReserva = newSel;
+                verificarSeleccion();
+            });
+            tbvLibrosReserva.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+                libroSeleccionadoReserva = newSel;
+                verificarSeleccion();
+            });
 
         } catch (SQLException ex) {
             System.err.println("Error en initialize: " + ex.getMessage());
         }
     }
     
+    private void verificarSeleccion() {
+        btnReservarAdmin.setDisable(usuarioSeleccionadoReserva == null || libroSeleccionadoReserva == null);
+    }
        
     /*
         BOTONES APARTADO LIBRO
@@ -898,7 +913,10 @@ public class ControladorMain implements Initializable{
     //BOTONES RESERVA ADMINISTRADOR
     @FXML
     void btnAccionReservarAdmin(ActionEvent event) {
-        
+        reservarLibroAUsuarioPorAdministrador(libroSeleccionadoReserva);
+        tbvLibrosReserva.getSelectionModel().clearSelection();
+        tbvUsuarioReserva.getSelectionModel().clearSelection();
+
     }
     
     
@@ -988,7 +1006,6 @@ public class ControladorMain implements Initializable{
                                          + expira.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                                          + "\n(Duración: 2 meses)");
                     exito.showAndWait();
-
                     tbvLibros.setItems(listaLibrosDisponibles());
 
                 } 
@@ -1068,6 +1085,110 @@ public class ControladorMain implements Initializable{
         }
     }
 
+    public void reservarLibroAUsuarioPorAdministrador(Libro libroSeleccionado) {
+        if (libroSeleccionado == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Reserva");
+            alert.setHeaderText(null);
+            alert.setContentText("Debes seleccionar un libro para reservar.");
+            alert.showAndWait();
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar reserva");
+        confirmacion.setHeaderText("¿Deseas reservar el libro?");
+        confirmacion.setContentText("Libro: " + libroSeleccionado.getTitulo());
+
+        Optional<ButtonType> resultado = confirmacion.showAndWait();
+        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+            String checkReservaSQL = "SELECT COUNT(*) FROM reserva "
+                                   + "WHERE idUsuario = ? AND idLibro = ? AND estado = 'ACTIVO'";
+
+            try {
+                conexion.setAutoCommit(false);
+
+                try (PreparedStatement psCheck = conexion.prepareStatement(checkReservaSQL)) {
+                    psCheck.setInt(1, usuarioSeleccionadoReserva.getIdUsuario());
+                    psCheck.setInt(2, libroSeleccionado.getIdLibro());
+                    ResultSet rs = psCheck.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        conexion.rollback();
+                        Alert dup = new Alert(Alert.AlertType.ERROR);
+                        dup.setTitle("Error en reserva");
+                        dup.setHeaderText("Reserva duplicada");
+                        dup.setContentText("Ya tienes una reserva activa para este libro.");
+                        dup.showAndWait();
+                        return;
+                    }
+                }
+
+                if (libroSeleccionado.getCopiasDisponibles() <= 0) {
+                    conexion.rollback();
+                    Alert sinCopias = new Alert(Alert.AlertType.ERROR);
+                    sinCopias.setTitle("Sin copias disponibles");
+                    sinCopias.setHeaderText("No se puede completar la reserva.");
+                    sinCopias.setContentText("No hay copias disponibles de: " + libroSeleccionado.getTitulo());
+                    sinCopias.showAndWait();
+                    return;
+                }
+
+                String insertReservaSQL = "INSERT INTO reserva "
+                                       + "(idUsuario, idLibro, fechaReserva, fechaExpiracion, estado) "
+                                       + "VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 MONTH), 'ACTIVO')";
+                String updateLibroSQL = "UPDATE libro "
+                                      + "SET copiasDisponibles = copiasDisponibles - 1 "
+                                      + "WHERE idLibro = ? AND copiasDisponibles > 0";
+
+                try (PreparedStatement psInsert = conexion.prepareStatement(insertReservaSQL);
+                     PreparedStatement psUpdate = conexion.prepareStatement(updateLibroSQL)) {
+
+                    psInsert.setInt(1, usuarioSeleccionadoReserva.getIdUsuario());
+                    psInsert.setInt(2, libroSeleccionado.getIdLibro());
+                    psInsert.executeUpdate();
+
+                    psUpdate.setInt(1, libroSeleccionado.getIdLibro());
+                    int rowsAffected = psUpdate.executeUpdate();
+                    if (rowsAffected == 0) {
+                        conexion.rollback();
+                        Alert errorUpd = new Alert(Alert.AlertType.ERROR);
+                        errorUpd.setTitle("Error");
+                        errorUpd.setHeaderText("No se pudo actualizar las copias.");
+                        errorUpd.setContentText("Intenta nuevamente más tarde.");
+                        errorUpd.showAndWait();
+                        return;
+                    }
+
+                    conexion.commit();
+
+                    LocalDate expira = LocalDate.now().plusMonths(2);
+                    Alert exito = new Alert(Alert.AlertType.INFORMATION);
+                    exito.setTitle("Reserva exitosa");
+                    exito.setHeaderText(null);
+                    exito.setContentText("Reserva realizada con éxito para: " 
+                                         + libroSeleccionado.getTitulo() 
+                                         + "\nLa reserva expirará el: " 
+                                         + expira.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                                         + "\n(Duración: 2 meses)");
+                    exito.showAndWait();
+
+                    tbvLibros.setItems(listaLibrosDisponibles());
+
+                } 
+
+            } catch (SQLException e) {
+                try { conexion.rollback(); } catch (SQLException ex) { /*…*/ }
+                Alert error = new Alert(Alert.AlertType.ERROR);
+                error.setTitle("Error");
+                error.setHeaderText("Fallo en la reserva.");
+                error.setContentText("Detalles: " + e.getMessage());
+                error.showAndWait();
+
+            } finally {
+                try { conexion.setAutoCommit(true); } catch (SQLException e) { /*…*/ }
+            }
+        }
+    }
 
 
     @FXML
