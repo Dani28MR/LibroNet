@@ -24,6 +24,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import modelo.ConexionSingleton;
+import modelo.Modo;
+import modelo.OperacionUsuario;
 import modelo.RolUsuario;
 import modelo.Usuario;
 import org.mindrot.jbcrypt.BCrypt;
@@ -86,16 +88,7 @@ public class ControladorLogin implements Initializable{
     
     @FXML
     void btnAccionCrearCuenta(ActionEvent event) throws IOException {
-        
-        FXMLLoader loader = new FXMLLoader(ControladorMain.class.getResource("/vista/designerUsuario.fxml"));
-        Parent root = loader.load();
-            
-        Stage stage = new Stage();
-        stage.setTitle("LibroNet");
-        stage.setScene(new Scene(root));
-        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
-        stage.setResizable(false);
-        stage.showAndWait();
+        abrirVentanaUsuario(new OperacionUsuario(Modo.ADD,null), "Añadir");
     }
 
     @FXML
@@ -141,6 +134,20 @@ public class ControladorLogin implements Initializable{
             e.printStackTrace();
         }
     }
+    public void abrirVentanaUsuario(OperacionUsuario operacion, String titulo) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/designerUsuario.fxml"));
+        Parent root = loader.load();
+
+        ControladorUsuario controladorUsuario = loader.getController();
+        controladorUsuario.setControladorLogin(this);
+        controladorUsuario.setOperacion(operacion);
+        
+        Stage stage = new Stage();
+        stage.setTitle(titulo + " usuario");
+        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+    }
     
     private void cargarImg(){
         imgLogo.setImage(new Image(getClass().getClassLoader().getResourceAsStream("icono_SinFondo.png")));
@@ -163,6 +170,7 @@ public class ControladorLogin implements Initializable{
                             rs.getString("imagenUsuario"), 
                             rs.getString("email"),
                             rs.getString("contraseña"),
+                            rs.getString("cofirmacionContraseña"),
                             rs.getString("telefono"),
                             rs.getString("direccion"),
                             RolUsuario.valueOf(rs.getString("rol")));
@@ -198,6 +206,7 @@ public class ControladorLogin implements Initializable{
                         rs.getString("imagenUsuario"), 
                         rs.getString("email"),
                         rs.getString("contraseña"),
+                        rs.getString("cofirmacionContraseña"),
                         rs.getString("telefono"),
                         rs.getString("direccion"),
                         RolUsuario.valueOf(rs.getString("rol")));
@@ -209,7 +218,6 @@ public class ControladorLogin implements Initializable{
             System.out.println("Error al obtener usuario: " + e.getMessage());
         }
         
-        //usuarioLogin = null;
         return false;
     }
     

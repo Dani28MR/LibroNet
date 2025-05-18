@@ -9,17 +9,19 @@ public class Usuario {
     private String imagenUsuario;
     private String email;
     private String contraseña;
+    private String cofirmacionContraseña;
     private String telefono;
     private String direccion;
     private RolUsuario rol;
 
-    public Usuario(int idUsuario, String nombre, String apellido,String imagen, String email, String contraseña, String telefono, String direccion, RolUsuario rol) {
+    public Usuario(int idUsuario, String nombreUsuario, String apellidoUsuario, String imagenUsuario, String email, String contraseña, String cofirmacionContraseña, String telefono, String direccion, RolUsuario rol) {
         this.idUsuario = idUsuario;
-        this.nombreUsuario = nombre;
-        this.apellidoUsuario = apellido;
-        this.imagenUsuario = imagen;
+        this.nombreUsuario = nombreUsuario;
+        this.apellidoUsuario = apellidoUsuario;
+        this.imagenUsuario = imagenUsuario;
         this.email = email;
         this.contraseña = contraseña;
+        this.cofirmacionContraseña = cofirmacionContraseña;
         this.telefono = telefono;
         this.direccion = direccion;
         this.rol = rol;
@@ -47,6 +49,10 @@ public class Usuario {
 
     public String getContraseña() {
         return contraseña;
+    }
+
+    public String getCofirmacionContraseña() {
+        return cofirmacionContraseña;
     }
 
     public String getTelefono() {
@@ -83,6 +89,10 @@ public class Usuario {
 
     public void setContraseña(String contraseña) {
         this.contraseña = contraseña;
+    }
+
+    public void setCofirmacionContraseña(String cofirmacionContraseña) {
+        this.cofirmacionContraseña = cofirmacionContraseña;
     }
 
     public void setTelefono(String telefono) {

@@ -1,6 +1,11 @@
 
 package controlador;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -10,12 +15,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -37,6 +44,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 import modelo.Autor;
 import modelo.Categoria;
 import modelo.ConexionSingleton;
@@ -1203,7 +1211,7 @@ public class ControladorMain implements Initializable{
     public ObservableList<Usuario> listaTodosUsuarios() {
         ObservableList<Usuario> lista = FXCollections.observableArrayList();
         String query = "SELECT idUsuario, nombreUsuario, apellidoUsuario, imagenUsuario, "
-                     + "email, `contraseña`, telefono, direccion, rol "
+                     + "email, `contraseña`,`cofirmacionContraseña`, telefono, direccion, rol "
                      + "FROM usuario";
 
         try (PreparedStatement pst = conexion.prepareStatement(query);
@@ -1218,8 +1226,9 @@ public class ControladorMain implements Initializable{
                     rs.getInt("idUsuario"),
                     rs.getString("nombreUsuario"),
                     rs.getString("apellidoUsuario"),
-                    rs.getString("imagenUsuario"),    // puede ser null
+                    rs.getString("imagenUsuario"),
                     rs.getString("email"),
+                    rs.getString("cofirmacionContraseña"),
                     rs.getString("contraseña"),
                     rs.getString("telefono"),
                     rs.getString("direccion"),
@@ -1240,6 +1249,10 @@ public class ControladorMain implements Initializable{
     private void actualizarInfo(){
         txtNombreUsuario.setText(usuarioLog.getNombreUsuario());
         txtEmailUsuario.setText(usuarioLog.getEmail());
+        imgUsuario.setImage(base64ToImage(usuarioLog.getImagenUsuario()));
+        imgUsuario.setFitWidth(100);
+        imgUsuario.setFitHeight(100);
+        imgUsuario.setPreserveRatio(true);
         
         if (usuarioLog.getIdUsuario() != 1) {
             tabUsuarios.setDisable(true);
@@ -1517,6 +1530,38 @@ public class ControladorMain implements Initializable{
         imgAddUsuario.setImage(new Image(getClass().getClassLoader().getResourceAsStream("add.png")));
         imgBorrarUsuario.setImage(new Image(getClass().getClassLoader().getResourceAsStream("borrar.png")));
         
+    }
+    
+    public String convertirImagenA64(File archivoImagen) {
+        try (
+            FileInputStream fileInputStream = new FileInputStream(archivoImagen);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
+        ) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            }
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+            return Base64.getEncoder().encodeToString(imageBytes); 
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    
+    public Image base64ToImage(String base64Image) {
+        try {
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
+            BufferedImage bufferedImage = ImageIO.read(bis);
+            Image image = SwingFXUtils.toFXImage(bufferedImage, null);
+            return image;
+            
+	} catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+	}
     }
     
     
