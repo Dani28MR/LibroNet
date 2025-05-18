@@ -105,21 +105,17 @@ public class ControladorLogin implements Initializable{
             //abrirVentanaVenta();
         }
         try {
-            // 2) Cargar FXML de la ventana principal
             FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/vista/designerMain.fxml")
             );
             Parent root = loader.load();
 
-            // 3) Obtener su controlador y pasarle el usuario
             cMain = loader.getController();
             cMain.recibirUsuarioLogin(usuarioLogin);
 
-            // 4) Cerrar la ventana de login
             Stage loginStage = (Stage) btnEntrar.getScene().getWindow();
             loginStage.close();
 
-            // 5) Mostrar la ventana principal
             Stage mainStage = new Stage();
             mainStage.setTitle("LibroNet");
             mainStage.getIcons().add(new Image(

@@ -13,9 +13,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox minHeight="785.0" prefHeight="832.0" prefWidth="1166.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorMain">
+<VBox minHeight="785.0" prefHeight="857.0" prefWidth="1166.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorMain">
    <children>
       <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="1096.0">
+         <!-- Contenido del header (se mantiene igual) -->
          <children>
             <Button fx:id="btnSalir" contentDisplay="TOP" onAction="#btnAccionSalir" prefHeight="59.0" prefWidth="0.0" text="_Salir">
                <graphic>
@@ -47,127 +48,192 @@
             <Insets left="15.0" />
          </padding>
       </HBox>
-      <TabPane prefHeight="700.0" prefWidth="1136.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane prefHeight="752.0" prefWidth="1136.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
+          <!-- Tab Libros modificado -->
           <Tab text="Libros">
                <content>
-                  <VBox alignment="CENTER" prefHeight="666.0" prefWidth="1136.0">
-                     <children>
-                        <HBox>
-                           <children>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                  <TabPane maxHeight="Infinity" maxWidth="Infinity" prefHeight="719.0" prefWidth="1136.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                      <Tab text="Listado de libros">
+                        <content>
+                          <!-- Contenido original del tab Libros -->
+                          <VBox alignment="CENTER" prefHeight="666.0" prefWidth="1136.0">
+                             <children>
+                                <HBox>
+                                   <children>
+                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                         <children>
+                                            <Button fx:id="btnVerLibros" contentDisplay="TOP" disable="true" onAction="#btnAccionVerLibros" text="_Ver">
+                                               <graphic>
+                                                  <ImageView fx:id="imgVerLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                               </graphic>
+                                            </Button>
+                                            <Button fx:id="btnEditarLibros" contentDisplay="TOP" disable="true" onAction="#btnAccionEditarLibros" text="_Editar">
+                                               <graphic>
+                                                  <ImageView fx:id="imgEditarLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                               </graphic>
+                                               <VBox.margin>
+                                                  <Insets top="15.0" />
+                                               </VBox.margin>
+                                            </Button>
+                                         </children>
+                                      </VBox>
+                                      <VBox prefHeight="621.0" prefWidth="933.0">
+                                         <children>
+                                            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="826.0">
+                                               <children>
+                                                  <Label text="¿Qué libros quieres visualizar?">
+                                                     <HBox.margin>
+                                                        <Insets left="15.0" />
+                                                     </HBox.margin>
+                                                  </Label>
+                                                  <VBox alignment="CENTER" prefHeight="99.0" prefWidth="133.0">
+                                                     <children>
+                                                        <RadioButton fx:id="opcTodosLibros" minWidth="130.0" mnemonicParsing="false" selected="true" text="Todos los libros">
+                                                           <VBox.margin>
+                                                              <Insets />
+                                                           </VBox.margin></RadioButton>
+                                                        <RadioButton fx:id="opcDisponibles" minWidth="130.0" mnemonicParsing="false" text="Libros dispoblibles">
+                                                           <VBox.margin>
+                                                              <Insets bottom="10.0" top="10.0" />
+                                                           </VBox.margin>
+                                                        </RadioButton>
+                                                        <RadioButton fx:id="opcReservas" minWidth="130.0" mnemonicParsing="false" text="Mis reservas">
+                                                           <VBox.margin>
+                                                              <Insets />
+                                                           </VBox.margin>
+                                                        </RadioButton>
+                                                     </children>
+                                                     <HBox.margin>
+                                                        <Insets left="15.0" />
+                                                     </HBox.margin>
+                                                  </VBox>
+                                                  <ImageView fx:id="imgLupaLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                                     <HBox.margin>
+                                                        <Insets left="325.0" />
+                                                     </HBox.margin>
+                                                  </ImageView>
+                                                  <TextField fx:id="txtFldLibro" minWidth="200.0" promptText="Introduce un título">
+                                                     <HBox.margin>
+                                                        <Insets left="15.0" />
+                                                     </HBox.margin>
+                                                  </TextField>
+                                               </children>
+                                            </HBox>
+                                            <TableView fx:id="tbvLibros" cache="true" maxWidth="900.0" prefHeight="523.0" prefWidth="600.0">
+                                              <columns>
+                                                <TableColumn fx:id="colISBNLibros" prefWidth="173.0" text="ISBN" />
+                                                <TableColumn fx:id="colTituloLibros" prefWidth="303.0" text="Título" />
+                                                  <TableColumn fx:id="colTotalCopiasLibros" prefWidth="209.0" text="Total de Copias" />
+                                                  <TableColumn fx:id="colCopiasDisponiblesLibros" prefWidth="212.0" text="Copias disponibles" />
+                                              </columns>
+                                               <VBox.margin>
+                                                  <Insets bottom="15.0" left="15.0" />
+                                               </VBox.margin>
+                                               <columnResizePolicy>
+                                                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                               </columnResizePolicy>
+                                            </TableView>
+                                         </children>
+                                      </VBox>
+                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                         <children>
+                                            <Button fx:id="btnAddLibros" contentDisplay="TOP" onAction="#btnAccionAddLibros" text="_Añadir">
+                                               <graphic>
+                                                  <ImageView fx:id="imgAddLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                               </graphic>
+                                            </Button>
+                                            <Button fx:id="btnBorrarLibros" contentDisplay="TOP" disable="true" onAction="#btnAccionBorrarLibros" text="_Borrar">
+                                               <graphic>
+                                                  <ImageView fx:id="imgBorrarLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+                                               </graphic>
+                                               <VBox.margin>
+                                                  <Insets top="15.0" />
+                                               </VBox.margin>
+                                            </Button>
+                                         </children>
+                                      </VBox>
+                                   </children>
+                                </HBox>
+                                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                   <children>
+                                      <Button fx:id="btnReservarLibros" disable="true" onAction="#btnAccionReservarLibros" prefHeight="30.0" prefWidth="400.0" text="_Reservar">
+                                         <HBox.margin>
+                                            <Insets right="20.0" />
+                                         </HBox.margin>
+                                      </Button>
+                                      <Button fx:id="btnCancelarReserva" disable="true" mnemonicParsing="false" onAction="#btnAccionCancelarReserva" prefHeight="30.0" prefWidth="400.0" text="Cancelar Reserva">
+                                         <HBox.margin>
+                                            <Insets left="20.0" />
+                                         </HBox.margin>
+                                      </Button>
+                                   </children>
+                                </HBox>
+                             </children>
+                          </VBox>
+                        </content>
+                      </Tab>
+                      <Tab fx:id="tabReservas" text="Hacer Reservas">
+                        <content>
+                          <VBox alignment="CENTER" spacing="20.0">
+                            <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                            </padding>
                                  <children>
-                                    <Button fx:id="btnVerLibros" contentDisplay="TOP" disable="true" onAction="#btnAccionVerLibros" text="_Ver">
-                                       <graphic>
-                                          <ImageView fx:id="imgVerLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
-                                       </graphic>
-                                    </Button>
-                                    <Button fx:id="btnEditarLibros" contentDisplay="TOP" disable="true" onAction="#btnAccionEditarLibros" text="_Editar">
-                                       <graphic>
-                                          <ImageView fx:id="imgEditarLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
-                                       </graphic>
-                                       <VBox.margin>
-                                          <Insets top="15.0" />
-                                       </VBox.margin>
-                                    </Button>
-                                 </children>
-                              </VBox>
-                              <VBox prefHeight="621.0" prefWidth="933.0">
-                                 <children>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="826.0">
+                                    <HBox alignment="CENTER" prefHeight="70.0" prefWidth="200.0">
                                        <children>
-                                          <Label text="¿Qué libros quieres visualizar?">
+                                          <Label text="Selecciona un usuario" />
+                                          <TextField fx:id="txtFldUsuarioReserva" promptText="Introduce un usuario">
                                              <HBox.margin>
-                                                <Insets left="15.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                          <VBox alignment="CENTER" prefHeight="99.0" prefWidth="133.0">
-                                             <children>
-                                                <RadioButton fx:id="opcTodosLibros" minWidth="130.0" mnemonicParsing="false" selected="true" text="Todos los libros">
-                                                   <VBox.margin>
-                                                      <Insets />
-                                                   </VBox.margin></RadioButton>
-                                                <RadioButton fx:id="opcDisponibles" minWidth="130.0" mnemonicParsing="false" text="Libros dispoblibles">
-                                                   <VBox.margin>
-                                                      <Insets bottom="10.0" top="10.0" />
-                                                   </VBox.margin>
-                                                </RadioButton>
-                                                <RadioButton fx:id="opcReservas" minWidth="130.0" mnemonicParsing="false" text="Mis reservas">
-                                                   <VBox.margin>
-                                                      <Insets />
-                                                   </VBox.margin>
-                                                </RadioButton>
-                                             </children>
-                                             <HBox.margin>
-                                                <Insets left="15.0" />
-                                             </HBox.margin>
-                                          </VBox>
-                                          <ImageView fx:id="imgLupaLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-                                             <HBox.margin>
-                                                <Insets left="325.0" />
-                                             </HBox.margin>
-                                          </ImageView>
-                                          <TextField fx:id="txtFldLibro" minWidth="200.0" promptText="Introduce un título">
-                                             <HBox.margin>
-                                                <Insets left="15.0" />
+                                                <Insets left="832.0" />
                                              </HBox.margin>
                                           </TextField>
                                        </children>
                                     </HBox>
-                                    <TableView fx:id="tbvLibros" cache="true" maxWidth="900.0" prefHeight="523.0" prefWidth="600.0">
+                                    <TableView fx:id="tbvUsuarioReserva" prefHeight="200.0" prefWidth="200.0">
                                       <columns>
-                                        <TableColumn fx:id="colISBNLibros" prefWidth="173.0" text="ISBN" />
-                                        <TableColumn fx:id="colTituloLibros" prefWidth="303.0" text="Titulo" />
-                                          <TableColumn fx:id="colTotalCopiasLibros" prefWidth="209.0" text="Total de Copias" />
-                                          <TableColumn fx:id="colCopiasDisponiblesLibros" prefWidth="212.0" text="Copias disponibles" />
+                                        <TableColumn fx:id="colNombreUsuarioReserva" prefWidth="75.0" text="Nombre" />
+                                        <TableColumn fx:id="colApellidoUsuarioReserva" prefWidth="75.0" text="Apellidos" />
+                                          <TableColumn fx:id="colTelefonoUsuarioReserva" prefWidth="75.0" text="Teléfono" />
+                                          <TableColumn fx:id="colDireccionUsuarioReserva" prefWidth="75.0" text="Dirección" />
                                       </columns>
-                                       <VBox.margin>
-                                          <Insets bottom="15.0" left="15.0" />
-                                       </VBox.margin>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
                                     </TableView>
+                                    <HBox alignment="CENTER" prefHeight="70.0" prefWidth="200.0">
+                                       <children>
+                                          <Label text="Selecciona un libro" />
+                                          <TextField fx:id="txtFldLibroReserva" promptText="Introduce un libro">
+                                             <HBox.margin>
+                                                <Insets left="843.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
+                                    <TableView fx:id="tbvLibrosReserva" prefHeight="200.0" prefWidth="200.0">
+                                      <columns>
+                                        <TableColumn fx:id="colISBNLibroReserva" minWidth="155.0" prefWidth="75.0" text="ISBN" />
+                                        <TableColumn fx:id="colTituloLibroReserva" minWidth="155.0" prefWidth="75.0" text="Título" />
+                                          <TableColumn fx:id="colCopiasLibroReserva" minWidth="155.0" prefWidth="236.0" text="Total de copias" />
+                                          <TableColumn fx:id="colDescripcionLibroReserva" prefWidth="312.0" text="Descripción" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                    <Button fx:id="btnReservarAdmin" disable="true" minHeight="40.0" minWidth="500.0" onAction="#btnAccionReservarAdmin" text="_Realizar reserva" />
                                  </children>
-                              </VBox>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                                 <children>
-                                    <Button fx:id="btnAddLibros" contentDisplay="TOP" onAction="#btnAccionAddLibros" text="_Añadir">
-                                       <graphic>
-                                          <ImageView fx:id="imgAddLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
-                                       </graphic>
-                                    </Button>
-                                    <Button fx:id="btnBorrarLibros" contentDisplay="TOP" disable="true" onAction="#btnAccionBorrarLibros" text="_Borrar">
-                                       <graphic>
-                                          <ImageView fx:id="imgBorrarLibro" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
-                                       </graphic>
-                                       <VBox.margin>
-                                          <Insets top="15.0" />
-                                       </VBox.margin>
-                                    </Button>
-                                 </children>
-                              </VBox>
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                           <children>
-                              <Button fx:id="btnReservarLibros" disable="true" onAction="#btnAccionReservarLibros" prefHeight="30.0" prefWidth="400.0" text="_Reservar">
-                                 <HBox.margin>
-                                    <Insets right="20.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button fx:id="btnCancelarReserva" disable="true" mnemonicParsing="false" onAction="#btnAccionCancelarReserva" prefHeight="30.0" prefWidth="400.0" text="Cancelar Reserva">
-                                 <HBox.margin>
-                                    <Insets left="20.0" />
-                                 </HBox.margin>
-                              </Button>
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
+                          </VBox>
+                        </content>
+                      </Tab>
+                    </tabs>
+                  </TabPane>
                </content>
           </Tab>
-            <Tab text="Autores">
+
+          <Tab text="Autores">
                <content>
                   <VBox alignment="CENTER" prefHeight="666.0" prefWidth="1136.0">
                      <children>
@@ -243,8 +309,8 @@
                      </children>
                   </VBox>
                </content>
-            </Tab>
-            <Tab text="Editoriales / Categorias">
+          </Tab>
+          <Tab text="Editoriales / Categorias">
                <content>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
@@ -386,7 +452,7 @@
                      </padding>
                   </VBox>
                </content>
-            </Tab>
+          </Tab>
           <Tab fx:id="tabUsuarios" text="Usuarios">
                <content>
                   <VBox alignment="CENTER" prefHeight="666.0" prefWidth="1136.0">
