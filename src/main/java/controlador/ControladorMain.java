@@ -402,7 +402,7 @@ public class ControladorMain implements Initializable{
             });
 
             // TABLA LIBROS
-            tbvLibros.setOnMouseClicked((MouseEvent ev) -> {
+            /*tbvLibros.setOnMouseClicked((MouseEvent ev) -> {
                 if (ev.getClickCount() == 2) {
                     Libro sel = tbvLibros.getSelectionModel().getSelectedItem();
                     if (sel != null) {
@@ -438,7 +438,45 @@ public class ControladorMain implements Initializable{
                         }
                     }
                 }
+            });*/
+            tbvLibros.setOnMouseClicked((MouseEvent ev) -> {
+                if (ev.getClickCount() == 2) {
+                    Libro sel = tbvLibros.getSelectionModel().getSelectedItem();
+                    if (sel != null) {
+                        libroSeleccionado = sel;
+                        btnVerLibros.setDisable(false);
+
+                        // Todos pueden reservar
+                        btnReservarLibros.setDisable(false);
+
+                        // Comprobar si ya tiene una reserva activa
+                        boolean tiene = false;
+                        String sql = "SELECT COUNT(*) FROM reserva "
+                                   + "WHERE idUsuario=? AND idLibro=? AND estado='ACTIVO'";
+                        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+                            ps.setInt(1, usuarioLog.getIdUsuario());
+                            ps.setInt(2, sel.getIdLibro());
+                            ResultSet rs = ps.executeQuery();
+                            if (rs.next() && rs.getInt(1) > 0) {
+                                tiene = true;
+                            }
+                        } catch (SQLException e) {
+                            System.err.println("Error comprobando reserva: " + e.getMessage());
+                        }
+                        btnCancelarReserva.setDisable(!tiene);
+
+                        // Configurar botones según el rol
+                        if (usuarioLog != null && usuarioLog.getRol() == RolUsuario.ADMINISTRADOR) {
+                            btnEditarLibros.setDisable(false);
+                            btnBorrarLibros.setDisable(false);
+                        } else {
+                            btnEditarLibros.setDisable(true);
+                            btnBorrarLibros.setDisable(true);
+                        }
+                    }
+                }
             });
+
             
             // TABLA AUTORES
             tbvAutores.setOnMouseClicked(event -> {
@@ -642,7 +680,7 @@ public class ControladorMain implements Initializable{
         alert.showAndWait();
     }
     
-    private void mostrarAlertaError(String titulo, String mensaje) {
+    void mostrarAlertaError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
@@ -672,7 +710,7 @@ public class ControladorMain implements Initializable{
 
     @FXML
     void btnAccionBorrarAutores(ActionEvent event) {
-
+        eliminarAutor();
     }
 
     public void abrirVentanaAutor(OperacionAutor operacion, String titulo) throws IOException {
@@ -688,6 +726,57 @@ public class ControladorMain implements Initializable{
         stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
         stage.setScene(new Scene(root));
         stage.showAndWait();
+    }
+    private void eliminarAutor() {
+        try {
+            if (autorSeleccionado == null) {
+                mostrarAlertaError("Error", "No hay ningún autor seleccionado para eliminar");
+                return;
+            }
+
+            int idAutor = autorSeleccionado.getIdAutor();
+
+            // Verificar si hay libros asociados al autor
+            String sqlCheck = "SELECT COUNT(*) FROM libro_Autor WHERE idAutor = ?";
+            try (PreparedStatement pstCheck = conexion.prepareStatement(sqlCheck)) {
+                pstCheck.setInt(1, idAutor);
+                ResultSet rs = pstCheck.executeQuery();
+
+                if (rs.next() && rs.getInt(1) > 0) {
+                    mostrarAlertaError(
+                        "No permitido",
+                        "Este autor no puede ser eliminado porque tiene libros asociados."
+                    );
+                    return;
+                }
+            }
+
+            // Confirmación de eliminación
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar este autor?");
+            confirmacion.setContentText("¡Esta acción no se puede deshacer!");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                String sqlDelete = "DELETE FROM autor WHERE idAutor = ?";
+                try (PreparedStatement pstDel = conexion.prepareStatement(sqlDelete)) {
+                    pstDel.setInt(1, idAutor);
+                    int filasAfectadas = pstDel.executeUpdate();
+
+                    if (filasAfectadas > 0) {
+                        mostrarAlertaExito("Éxito", "Autor eliminado correctamente");
+                        // Actualizar la tabla de autores
+                        tbvAutores.setItems(listaTodosAutores());
+                    } else {
+                        mostrarAlertaError("Error", "No se pudo eliminar el autor");
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
     }
     
     /*
@@ -1408,7 +1497,7 @@ public class ControladorMain implements Initializable{
             tabUsuarios.setDisable(true);
             tabReservas.setDisable(true);
         }else{
-            opcReservas.setDisable(true);
+            //opcReservas.setDisable(true);
             
         }
         

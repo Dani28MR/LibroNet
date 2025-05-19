@@ -89,7 +89,7 @@ public class ControladorUsuario implements Initializable{
                 crearNuevoUsuario();
             }
             case EDITAR -> {
-                //editarUsuario();
+                editarUsuario();
             }
         }
     }
@@ -127,7 +127,6 @@ public class ControladorUsuario implements Initializable{
             } catch (Exception e) {
                 mostrarAlertaError("Error de carga", "Por favor, seleccione un archivo de imagen válido (PNG, JPG, JPEG, GIF).");
             }
-            
         }
     }
     
@@ -210,8 +209,108 @@ public class ControladorUsuario implements Initializable{
 
         cMain.tbvUsuarios.setItems(cMain.listaTodosUsuarios());
     }
-
     
+    private void editarUsuario() {
+        try {
+            if (usuarioSeleccionado == null) {
+                mostrarAlertaError("Error", "No hay ningún usuario seleccionado para editar");
+                return;
+            }
+
+            int idUsuario = usuarioSeleccionado.getIdUsuario();
+            String nombre = txtNombre.getText().trim();
+            String apellido = txtApellidos.getText().trim();
+            String email = txtEmail.getText().trim();
+            String nuevoPassword = txtPassword.getText();
+            String confirmacionPassword = txtPasswordConfirmacion.getText();
+            String telefono = txtTelefono.getText().trim();
+            String direccion = txtDireccion.getText().trim();
+            String rol = usuarioSeleccionado.getRol().toString();
+            String imagenBase64 = usuarioSeleccionado.getImagenUsuario();
+
+            // Validación de campos obligatorios
+            if (nombre.isEmpty() || apellido.isEmpty() || email.isEmpty()) {
+                mostrarAlertaError("Error", "Nombre, apellido y email son campos obligatorios");
+                return;
+            }
+
+            // Validación formato email
+            if (!email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                mostrarAlertaError("Email inválido", "Formato de email incorrecto");
+                return;
+            }
+
+            // Verificar si el email ya existe en otro usuario
+            if (!email.equals(usuarioSeleccionado.getEmail())) {
+                String sqlCheckEmail = "SELECT COUNT(*) FROM usuario WHERE email = ? AND idUsuario != ?";
+                try (PreparedStatement pst = conexion.prepareStatement(sqlCheckEmail)) {
+                    pst.setString(1, email);
+                    pst.setInt(2, idUsuario);
+                    ResultSet rs = pst.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        mostrarAlertaError("Email en uso", "Este email ya está registrado por otro usuario");
+                        return;
+                    }
+                }
+            }
+
+            // Manejo de contraseña
+            String hashedPassword = usuarioSeleccionado.getContraseña();
+            if (!nuevoPassword.isEmpty()) {
+                if (nuevoPassword.length() < 8) {
+                    mostrarAlertaError("Contraseña débil", "La contraseña debe tener al menos 8 caracteres");
+                    return;
+                }
+
+                if (!nuevoPassword.equals(confirmacionPassword)) {
+                    mostrarAlertaError("Error", "Las contraseñas no coinciden");
+                    return;
+                }
+
+                hashedPassword = BCrypt.hashpw(nuevoPassword, BCrypt.gensalt());
+            }
+
+            // Manejo de imagen
+            if (rutaImg != null) {
+                imagenBase64 = cMain.convertirImagenA64(rutaImg);
+            }
+
+            // Actualización en base de datos
+            String sqlUpdate = "UPDATE usuario SET "
+                    + "nombreUsuario = ?, "
+                    + "apellidoUsuario = ?, "
+                    + "imagenUsuario = ?, "
+                    + "email = ?, "
+                    + "contraseña = ?, "
+                    + "telefono = ?, "
+                    + "direccion = ?, "
+                    + "rol = ? "
+                    + "WHERE idUsuario = ?";
+
+            try (PreparedStatement pst = conexion.prepareStatement(sqlUpdate)) {
+                pst.setString(1, nombre);
+                pst.setString(2, apellido);
+                pst.setString(3, imagenBase64);
+                pst.setString(4, email);
+                pst.setString(5, hashedPassword);
+                pst.setString(6, telefono.isEmpty() ? null : telefono);
+                pst.setString(7, direccion.isEmpty() ? null : direccion);
+                pst.setString(8, rol);
+                pst.setInt(9, idUsuario);
+
+                int filasAfectadas = pst.executeUpdate();
+                if (filasAfectadas > 0) {
+                    mostrarAlertaExito("Éxito", "Usuario actualizado correctamente");
+                    cMain.tbvUsuarios.setItems(cMain.listaTodosUsuarios());
+                } else {
+                    mostrarAlertaError("Error", "No se pudo actualizar el usuario");
+                }
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
+    }   
     
     public void initDatos() {
         try {

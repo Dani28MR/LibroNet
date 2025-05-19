@@ -1,8 +1,10 @@
 
 package controlador;
 
+import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,6 +18,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import modelo.Autor;
 import static modelo.Modo.EDITAR;
@@ -54,6 +57,7 @@ public class ControladorAutor implements Initializable{
     private ControladorMain cMain;
     private OperacionAutor operacion;
     Autor autorSeleccionado;
+    File rutaImg;
 
     
     @Override
@@ -63,7 +67,14 @@ public class ControladorAutor implements Initializable{
     
     @FXML
     void btnAccionAceptar(ActionEvent event) {
-
+        switch (operacion.modo()) {
+            case ADD -> {
+                crearAutor();
+            }
+            case EDITAR -> {
+                editarAutor();
+            }
+        }
     }
 
     @FXML
@@ -73,7 +84,155 @@ public class ControladorAutor implements Initializable{
 
     @FXML
     void btnAccionImagen(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Seleccionar imagen");
 
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+            "Archivos de imagen", 
+            "*.png", "*.jpg", "*.jpeg", "*.gif"
+        );
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File archivoSeleccionado = fileChooser.showOpenDialog(
+            ((Node) event.getSource()).getScene().getWindow()
+        );
+
+        if (archivoSeleccionado != null) {
+            try {
+                rutaImg = archivoSeleccionado;
+            
+                Image image = new Image(rutaImg.toURI().toString());
+                imgAutor.setImage(image);
+                imgAutor.setFitWidth(200);
+                imgAutor.setFitHeight(150);
+                imgAutor.setPreserveRatio(true);
+            } catch (Exception e) {
+                cMain.mostrarAlertaError("Error de carga", "Por favor, seleccione un archivo de imagen válido (PNG, JPG, JPEG, GIF).");
+            }
+        }
+    }
+    
+    private void crearAutor() {
+        String nombre = txtNombre.getText().trim();
+        String apellidos = txtApellidos.getText().trim();
+        String nacionalidad = txtNacionalidad.getText().trim();
+        String biografia = txtBiografia.getText().trim();
+
+        if (nombre.isEmpty() || apellidos.isEmpty() || nacionalidad.isEmpty() || biografia.isEmpty() || rutaImg == null) {
+            cMain.mostrarAlertaError("Error", "Nombre, apellidos, nacionalidad, biografía e imagen son campos obligatorios");
+            return;
+        }
+        
+        String imagen = cMain.convertirImagenA64(rutaImg);
+
+        try {
+            String sqlCheck = "SELECT COUNT(*) FROM autor WHERE nombreAutor = ? AND apellidoAutor = ?";
+            try (PreparedStatement pstCheck = conexion.prepareStatement(sqlCheck)) {
+                pstCheck.setString(1, nombre);
+                pstCheck.setString(2, apellidos);
+
+                ResultSet rs = pstCheck.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    cMain.mostrarAlertaError("Autor existente", "Ya existe un autor con ese nombre y apellidos");
+                    return;
+                }
+            }
+
+            String sqlInsert = "INSERT INTO autor (nombreAutor, apellidoAutor, nacionalidad, imagenAutor, biografia) "
+                             + "VALUES (?, ?, ?, ?, ?)";
+
+            try (PreparedStatement pstInsert = conexion.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)) {
+                pstInsert.setString(1, nombre);
+                pstInsert.setString(2, apellidos);
+                pstInsert.setString(3, nacionalidad);
+                pstInsert.setString(4, imagen);
+                pstInsert.setString(5, biografia);
+
+                int filasAfectadas = pstInsert.executeUpdate();
+
+                if (filasAfectadas > 0) {
+                    cMain.mostrarAlertaExito("Éxito", "Autor creado correctamente");
+                    Stage stage = (Stage) txtNombre.getScene().getWindow();
+                    stage.close();
+                    // Actualizar la tabla de autores
+                    cMain.tbvAutores.setItems(cMain.listaTodosAutores());
+                } else {
+                    cMain.mostrarAlertaError("Error", "No se pudo crear el autor");
+                }
+            }
+        } catch (SQLException e) {
+            cMain.mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
+    }
+    
+    private void editarAutor() {
+        try {
+            if (autorSeleccionado == null) {
+                cMain.mostrarAlertaError("Error", "No hay ningún autor seleccionado para editar");
+                return;
+            }
+
+            String nombre = txtNombre.getText().trim();
+            String apellidos = txtApellidos.getText().trim();
+            String nacionalidad = txtNacionalidad.getText().trim();
+            String biografia = txtBiografia.getText().trim();
+            String imagen;
+
+            // Validación campos obligatorios (incluyendo imagen)
+            if (nombre.isEmpty() || apellidos.isEmpty() || nacionalidad.isEmpty() || biografia.isEmpty() || rutaImg == null) {
+                cMain.mostrarAlertaError("Error", "Nombre, apellidos, nacionalidad, biografía e imagen son campos obligatorios");
+                return;
+            }
+
+            // Conversión obligatoria de la nueva imagen
+            imagen = cMain.convertirImagenA64(rutaImg);
+
+            // Verificar duplicados excluyendo el autor actual
+            String sqlCheck = "SELECT COUNT(*) FROM autor WHERE nombreAutor = ? AND apellidoAutor = ? AND idAutor != ?";
+            try (PreparedStatement pstCheck = conexion.prepareStatement(sqlCheck)) {
+                pstCheck.setString(1, nombre);
+                pstCheck.setString(2, apellidos);
+                pstCheck.setInt(3, autorSeleccionado.getIdAutor());
+
+                ResultSet rs = pstCheck.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    cMain.mostrarAlertaError("Autor existente", "Ya existe otro autor con ese nombre y apellidos");
+                    return;
+                }
+            }
+
+            // Actualización en base de datos
+            String sqlUpdate = "UPDATE autor SET "
+                    + "nombreAutor = ?, "
+                    + "apellidoAutor = ?, "
+                    + "nacionalidad = ?, "
+                    + "imagenAutor = ?, "
+                    + "biografia = ? "
+                    + "WHERE idAutor = ?";
+
+            try (PreparedStatement pstUpdate = conexion.prepareStatement(sqlUpdate)) {
+                pstUpdate.setString(1, nombre);
+                pstUpdate.setString(2, apellidos);
+                pstUpdate.setString(3, nacionalidad);
+                pstUpdate.setString(4, imagen);
+                pstUpdate.setString(5, biografia);
+                pstUpdate.setInt(6, autorSeleccionado.getIdAutor());
+
+                int filasAfectadas = pstUpdate.executeUpdate();
+                if (filasAfectadas > 0) {
+                    cMain.mostrarAlertaExito("Éxito", "Autor actualizado correctamente");
+
+                    // Actualizar tabla y cerrar ventana
+                    cMain.tbvAutores.setItems(cMain.listaTodosAutores());
+                    Stage stage = (Stage) txtNombre.getScene().getWindow();
+                    stage.close();
+                } else {
+                    cMain.mostrarAlertaError("Error", "No se pudo actualizar el autor");
+                }
+            }
+        } catch (SQLException e) {
+            cMain.mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
     }
     
     public void initDatos() {
@@ -90,7 +249,7 @@ public class ControladorAutor implements Initializable{
     
     public void setControladorMain(ControladorMain cMain) {
         this.cMain = cMain;
-        initDatos(); // 🔑 Llama a initDatos() después de asignar cMain
+        initDatos();
     }
     public void setOperacion(OperacionAutor operacion) {
         this.operacion = operacion;
@@ -126,6 +285,15 @@ public class ControladorAutor implements Initializable{
         txtApellidos.setText(autorSeleccionado.getApellidosAutor());
         txtNacionalidad.setText(autorSeleccionado.getNacionalidad());
         txtBiografia.setText(autorSeleccionado.getBiografia());
+        
+        String imagenBase64 = autorSeleccionado.getImagenAutor();
+        if (imagenBase64 != null) {
+            imgAutor.setImage(cMain.base64ToImage(imagenBase64));
+            imgAutor.setFitWidth(200);
+            imgAutor.setFitHeight(150);
+            imgAutor.setPreserveRatio(true);
+        }
+        
     }
     
     
