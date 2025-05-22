@@ -14,6 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -22,6 +23,10 @@ import static modelo.Modo.ADD;
 import static modelo.Modo.EDITAR;
 import static modelo.Modo.VER;
 import modelo.OperacionEditorial;
+import org.controlsfx.validation.ValidationMessage;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 public class ControladorEditorial implements Initializable {
 
@@ -46,6 +51,7 @@ public class ControladorEditorial implements Initializable {
     private ControladorMain cMain;
     private OperacionEditorial operacion;
     Editorial editorialSeleccionado;
+    private ValidationSupport validationSupport;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -59,6 +65,7 @@ public class ControladorEditorial implements Initializable {
                 crearNuevaEditorial();
             }
             case EDITAR -> {
+                validationSupport.setErrorDecorationEnabled(false); 
                 editarEditorial();
             }
         }
@@ -74,11 +81,34 @@ public class ControladorEditorial implements Initializable {
             conexion = cMain.dameConnection();
             if (conexion != null) {
                 this.st = conexion.createStatement();
+                validarCampos();
                 
             }
         } catch (SQLException e) {
             System.out.println("Error en la conexión: " + e.getMessage());
         }
+    }
+    
+    private void validarCampos() {
+        validationSupport = new ValidationSupport();
+
+        validationSupport.registerValidator(txtNombre, 
+            Validator.createEmptyValidator("El nombre es obligatorio"));
+
+        validationSupport.registerValidator(txtDireccion, 
+            Validator.createEmptyValidator("La dirección es obligatori"));
+
+        validationSupport.registerValidator(txtTelefono, true, (Control c, String value) -> {
+        boolean isValid = value != null && value.matches("\\d{9}");
+            ValidationMessage message = isValid
+                ? null
+                : ValidationMessage.error(c, "El teléfono es obligatorio y debe tener 9 dígitos (ej: 612345678)");
+            return ValidationResult.fromMessages(message);
+        });
+        
+        validationSupport.validationResultProperty().addListener((obs, oldResult, newResult) -> {
+            btnAceptar.setDisable(newResult.getErrors().size() > 0);
+        });
     }
     
     public void setControladorMain(ControladorMain cMain) {
@@ -122,14 +152,6 @@ public class ControladorEditorial implements Initializable {
         String direccion = txtDireccion.getText().trim();
         String telefono = txtTelefono.getText().trim();
 
-        if (nombre.isEmpty() || direccion.isEmpty() || telefono.isEmpty()) {
-            mostrarAlertaError(
-                "Error de validación",
-                "Todos los campos (Nombre, Dirección y Teléfono) son obligatorios y no pueden quedar vacíos."
-            );
-            return;
-        }
-
         try {
             String queryCheck = "SELECT COUNT(*) FROM editorial WHERE nombreEditorial = ?";
             try (PreparedStatement pstCheck = conexion.prepareStatement(queryCheck)) {
@@ -171,13 +193,6 @@ public class ControladorEditorial implements Initializable {
         String direccion = txtDireccion.getText().trim();
         String telefono  = txtTelefono.getText().trim();
 
-        if (nombre.isEmpty() || direccion.isEmpty() || telefono.isEmpty()) {
-            mostrarAlertaError(
-                "Error de validación",
-                "Todos los campos (Nombre, Dirección y Teléfono) son obligatorios y no pueden quedar vacíos."
-            );
-            return;
-        }
 
         int idEditorial = editorialSeleccionado.getIdEditorial();
 
@@ -210,6 +225,7 @@ public class ControladorEditorial implements Initializable {
 
         cMain.tbvEditoriales.setItems(cMain.listaTodasEditoriales());
     }
+
 
 
     private void mostrarAlertaExito(String titulo, String mensaje) {

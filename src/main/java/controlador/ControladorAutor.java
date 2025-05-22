@@ -269,8 +269,6 @@ public class ControladorAutor implements Initializable{
         validationSupport.validationResultProperty().addListener((obs, oldResult, newResult) -> {
             btnAceptar.setDisable(newResult.getErrors().size() > 0);
         });
-        
-
     }
     
     public void setControladorMain(ControladorMain cMain) {

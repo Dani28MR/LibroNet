@@ -20,6 +20,8 @@ import javafx.stage.Stage;
 import modelo.Categoria;
 import static modelo.Modo.VER;
 import modelo.OperacionCategoria;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 public class ControladorCategoria implements Initializable{
     @FXML
@@ -37,6 +39,7 @@ public class ControladorCategoria implements Initializable{
     private ControladorMain cMain;
     private OperacionCategoria operacion;
     Categoria categoriaSeleccionado;
+    private ValidationSupport validationSupport;
 
     
     @Override
@@ -59,11 +62,22 @@ public class ControladorCategoria implements Initializable{
             conexion = cMain.dameConnection();
             if (conexion != null) {
                 this.st = conexion.createStatement();
-                
+                validarCampos();
             }
         } catch (SQLException e) {
             System.out.println("Error en la conexión: " + e.getMessage());
         }
+    }
+    
+    private void validarCampos() {
+        validationSupport = new ValidationSupport();
+
+        validationSupport.registerValidator(txtNombre, 
+            Validator.createEmptyValidator("El nombre es obligatorio"));
+        
+        validationSupport.validationResultProperty().addListener((obs, oldResult, newResult) -> {
+            btnAceptar.setDisable(newResult.getErrors().size() > 0);
+        });
     }
     
     public void setControladorMain(ControladorMain cMain) {
@@ -85,11 +99,6 @@ public class ControladorCategoria implements Initializable{
     
     private void crearNuevaCategoria() {
         String nombreCat = txtNombre.getText().trim();
-
-        if (nombreCat.isEmpty()) {
-            mostrarAlertaError("Error", "El nombre de la categoría no puede estar vacío");
-            return;
-        }
 
         try {
             String queryCheck = "SELECT COUNT(*) FROM categoria WHERE nombreCategoria = ?";
