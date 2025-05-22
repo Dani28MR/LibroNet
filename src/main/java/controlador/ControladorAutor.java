@@ -24,6 +24,8 @@ import modelo.Autor;
 import static modelo.Modo.EDITAR;
 import static modelo.Modo.VER;
 import modelo.OperacionAutor;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 public class ControladorAutor implements Initializable{
     
@@ -58,6 +60,7 @@ public class ControladorAutor implements Initializable{
     private OperacionAutor operacion;
     Autor autorSeleccionado;
     File rutaImg;
+    private ValidationSupport validationSupport;
 
     
     @Override
@@ -72,6 +75,7 @@ public class ControladorAutor implements Initializable{
                 crearAutor();
             }
             case EDITAR -> {
+                validationSupport.setErrorDecorationEnabled(false); 
                 editarAutor();
             }
         }
@@ -118,8 +122,8 @@ public class ControladorAutor implements Initializable{
         String nacionalidad = txtNacionalidad.getText().trim();
         String biografia = txtBiografia.getText().trim();
 
-        if (nombre.isEmpty() || apellidos.isEmpty() || nacionalidad.isEmpty() || biografia.isEmpty() || rutaImg == null) {
-            cMain.mostrarAlertaError("Error", "Nombre, apellidos, nacionalidad, biografía e imagen son campos obligatorios");
+        if (rutaImg == null) {
+            cMain.mostrarAlertaError("Error", "La imagen es obligatoria");
             return;
         }
         
@@ -178,14 +182,13 @@ public class ControladorAutor implements Initializable{
             String biografia = txtBiografia.getText().trim();
             String imagen;
 
-            // Validación campos obligatorios (incluyendo imagen)
-            if (nombre.isEmpty() || apellidos.isEmpty() || nacionalidad.isEmpty() || biografia.isEmpty() || rutaImg == null) {
-                cMain.mostrarAlertaError("Error", "Nombre, apellidos, nacionalidad, biografía e imagen son campos obligatorios");
-                return;
+            if (rutaImg != null) {
+                // El usuario ha seleccionado una nueva imagen
+                imagen = cMain.convertirImagenA64(rutaImg);
+            } else {
+                // El usuario no ha seleccionado nueva imagen → mantener la existente
+                imagen = autorSeleccionado.getImagenAutor();
             }
-
-            // Conversión obligatoria de la nueva imagen
-            imagen = cMain.convertirImagenA64(rutaImg);
 
             // Verificar duplicados excluyendo el autor actual
             String sqlCheck = "SELECT COUNT(*) FROM autor WHERE nombreAutor = ? AND apellidoAutor = ? AND idAutor != ?";
@@ -240,11 +243,34 @@ public class ControladorAutor implements Initializable{
             conexion = cMain.dameConnection();
             if (conexion != null) {
                 this.st = conexion.createStatement();
-                
+                validarCampos();
             }
         } catch (SQLException e) {
             System.out.println("Error en la conexión: " + e.getMessage());
         }
+    }
+    
+    private void validarCampos() {
+        validationSupport = new ValidationSupport();
+
+        validationSupport.registerValidator(txtNombre, 
+            Validator.createEmptyValidator("El nombre es obligatorio"));
+
+        validationSupport.registerValidator(txtApellidos, 
+            Validator.createEmptyValidator("Los apellidos es obligatorio"));
+
+        validationSupport.registerValidator(txtNacionalidad, 
+            Validator.createEmptyValidator("La nacionalidad es obligatoria"));
+
+        
+        validationSupport.registerValidator(txtBiografia, 
+            Validator.createEmptyValidator("Debe seleccionar una categoría"));
+        
+        validationSupport.validationResultProperty().addListener((obs, oldResult, newResult) -> {
+            btnAceptar.setDisable(newResult.getErrors().size() > 0);
+        });
+        
+
     }
     
     public void setControladorMain(ControladorMain cMain) {
