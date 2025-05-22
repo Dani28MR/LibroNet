@@ -26,6 +26,9 @@ public class Usuario {
         this.direccion = direccion;
         this.rol = rol;
     }
+    public Usuario(){
+        
+    }
 
     public int getIdUsuario() {
         return idUsuario;

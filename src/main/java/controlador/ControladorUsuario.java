@@ -333,7 +333,7 @@ public class ControladorUsuario implements Initializable{
             boolean isValid = value != null && value.equals(password);
             ValidationMessage message = isValid
                 ? null
-                : ValidationMessage.error(c, "Las contraseñas no coinciden");
+                : ValidationMessage.error(c, "Las contraseñas no coinciden y debe tener al menos 6 caracteres y una mayúscula (ej: Abcd1234)");
             return ValidationResult.fromMessages(message);
         });
 

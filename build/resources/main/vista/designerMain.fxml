@@ -22,11 +22,14 @@
                <graphic>
                   <ImageView fx:id="imgSalir" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
                </graphic></Button>
-            <ImageView fx:id="imgUsuario" fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+            <Button mnemonicParsing="false" onAction="#btnAccionUsuario">
+               <graphic>
+                  <ImageView fx:id="imgUsuario" fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic>
                <HBox.margin>
                   <Insets left="820.0" />
                </HBox.margin>
-            </ImageView>
+            </Button>
             <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="421.0">
                <children>
                   <Label fx:id="txtNombreUsuario" text="Nombre" />

@@ -927,7 +927,13 @@ public class ControladorMain implements Initializable{
 
     @FXML
     void btnAccionBorrarUsuarios(ActionEvent event) {
-
+        eliminarUsuario();
+    }
+    
+    @FXML
+    void btnAccionUsuario(ActionEvent event) throws IOException {
+        int idUsuarioLog = usuarioLog.getIdUsuario();
+        abrirVentanaUsuario(new OperacionUsuario(Modo.EDITAR, obtenerUsuarioPorId(idUsuarioLog)), "Editar");
     }
     public void abrirVentanaUsuario(OperacionUsuario operacion, String titulo) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista/designerUsuario.fxml"));
@@ -943,6 +949,95 @@ public class ControladorMain implements Initializable{
         stage.setScene(new Scene(root));
         stage.showAndWait();
     }
+    
+    private void eliminarUsuario() {
+        try {
+            if (usuarioSeleccionado == null) {
+                mostrarAlertaError("Error", "No hay ningún usuario seleccionado para eliminar");
+                return;
+            }
+
+            // Comprobar si el usuario seleccionado es el administrador
+            String emailUsuario = usuarioSeleccionado.getEmail();
+            if ("admin@admin.com".equalsIgnoreCase(emailUsuario)) {
+                mostrarAlertaError("Acción no permitida", "No se puede eliminar la cuenta administradora.");
+                return;
+            }
+
+            int idUsuario = usuarioSeleccionado.getIdUsuario();
+
+            // Verificar si el usuario tiene reservas activas
+            String sqlCheck = "SELECT COUNT(*) FROM reserva WHERE idUsuario = ? AND estado = 'ACTIVO'";
+            try (PreparedStatement pstCheck = conexion.prepareStatement(sqlCheck)) {
+                pstCheck.setInt(1, idUsuario);
+                ResultSet rs = pstCheck.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    mostrarAlertaError(
+                        "No permitido",
+                        "Este usuario no puede ser eliminado porque tiene reservas activas."
+                    );
+                    return;
+                }
+            }
+
+            // Confirmación de eliminación
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el usuario?");
+            confirmacion.setContentText("¡Esta acción no se puede deshacer!");
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                String sqlDelete = "DELETE FROM usuario WHERE idUsuario = ?";
+                try (PreparedStatement pstDel = conexion.prepareStatement(sqlDelete)) {
+                    pstDel.setInt(1, idUsuario);
+                    int filasAfectadas = pstDel.executeUpdate();
+
+                    if (filasAfectadas > 0) {
+                        mostrarAlertaExito("Éxito", "Usuario eliminado correctamente");
+                        tbvUsuarios.setItems(listaTodosUsuarios());
+                    } else {
+                        mostrarAlertaError("Error", "No se pudo eliminar el usuario");
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
+    }
+
+    public Usuario obtenerUsuarioPorId(int idUsuario) {
+        Usuario usuario = null;
+
+        String sql = "SELECT * FROM usuario WHERE idUsuario = ?";
+
+        try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+            pst.setInt(1, idUsuario);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                usuario = new Usuario();
+                usuario.setIdUsuario(rs.getInt("idUsuario"));
+                usuario.setNombreUsuario(rs.getString("nombreUsuario"));
+                usuario.setApellidoUsuario(rs.getString("apellidoUsuario"));
+                usuario.setImagenUsuario(rs.getString("imagenUsuario")); // Asumiendo que es una URL o base64
+                usuario.setEmail(rs.getString("email"));
+                usuario.setContraseña(rs.getString("contraseña"));
+                usuario.setCofirmacionContraseña(rs.getString("cofirmacionContraseña"));
+                usuario.setTelefono(rs.getString("telefono"));
+                usuario.setDireccion(rs.getString("direccion"));
+                usuario.setRol(RolUsuario.valueOf(rs.getString("rol")));
+
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error al obtener usuario", e.getMessage());
+        }
+
+        return usuario;
+    }
+
     
     //BOTONES RESERVA
 
@@ -964,7 +1059,6 @@ public class ControladorMain implements Initializable{
         reservarLibroAUsuarioPorAdministrador(libroSeleccionadoReserva);
         tbvLibrosReserva.getSelectionModel().clearSelection();
         tbvUsuarioReserva.getSelectionModel().clearSelection();
-
     }
     
     
