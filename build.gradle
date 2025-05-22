@@ -56,3 +56,14 @@ sourceSets {
   }
 }
 
+run {
+    jvmArgs += [
+        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
+    ]
+}
+
+application {
+    applicationDefaultJvmArgs = [
+        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
+    ]
+}

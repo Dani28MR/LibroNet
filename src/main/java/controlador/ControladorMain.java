@@ -402,43 +402,7 @@ public class ControladorMain implements Initializable{
             });
 
             // TABLA LIBROS
-            /*tbvLibros.setOnMouseClicked((MouseEvent ev) -> {
-                if (ev.getClickCount() == 2) {
-                    Libro sel = tbvLibros.getSelectionModel().getSelectedItem();
-                    if (sel != null) {
-                        libroSeleccionado = sel;
-                        btnVerLibros.setDisable(false);
-
-                        if (usuarioLog != null && usuarioLog.getRol() == RolUsuario.ADMINISTRADOR) {
-                            // Admin: CRUD completo menos reservar/cancelar
-                            btnEditarLibros.setDisable(false);
-                            btnBorrarLibros.setDisable(false);
-                            btnReservarLibros .setDisable(true);
-                            btnCancelarReserva.setDisable(true);
-                        } else {
-                            // Usuario normal: puede reservar siempre
-                            btnReservarLibros.setDisable(false);
-                            btnEditarLibros.setDisable(true);
-                            btnBorrarLibros.setDisable(true);
-
-                            boolean tiene = false;
-                            String sql = "SELECT COUNT(*) FROM reserva "
-                                       + "WHERE idUsuario=? AND idLibro=? AND estado='ACTIVO'";
-                            try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-                                ps.setInt(1, usuarioLog.getIdUsuario());
-                                ps.setInt(2, sel.getIdLibro());
-                                ResultSet rs = ps.executeQuery();
-                                if (rs.next() && rs.getInt(1) > 0) {
-                                    tiene = true;
-                                }
-                            } catch (SQLException e) {
-                                System.err.println("Error comprobando reserva: " + e.getMessage());
-                            }
-                            btnCancelarReserva.setDisable(!tiene);
-                        }
-                    }
-                }
-            });*/
+            
             tbvLibros.setOnMouseClicked((MouseEvent ev) -> {
                 if (ev.getClickCount() == 2) {
                     Libro sel = tbvLibros.getSelectionModel().getSelectedItem();
@@ -608,11 +572,6 @@ public class ControladorMain implements Initializable{
             if (tieneReservas(idLibro)) {
                 mostrarAlertaError("No permitido", "Este libro no puede ser eliminado porque tiene reservas asociadas.");
                 
-                return;
-            }
-
-            if (tieneAutoresRelacionados(idLibro)) {
-                mostrarAlertaError("No permitido", "Este libro no puede ser eliminado porque está relacionado con uno o más autores.");
                 return;
             }
         

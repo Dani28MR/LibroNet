@@ -34,6 +34,8 @@ import modelo.Libro;
 import static modelo.Modo.EDITAR;
 import static modelo.Modo.VER;
 import modelo.OperacionLibro;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 public class ControladorLibro implements Initializable{
 
@@ -48,18 +50,27 @@ public class ControladorLibro implements Initializable{
 
     @FXML
     private ListView<String> lstEditoriales;
+    
+    @FXML
+    private ListView<String> lstAutores;
 
     @FXML
-    private Label txtCategoriaElegida;
+    private TextField txtCategoriaElegida;
+    
+    @FXML
+    private TextField txtAutorElegido;
 
     @FXML
     private TextField txtCategoriaIntroducida;
+    
+    @FXML
+    private TextField txtAutorIntroducido;
 
     @FXML
     private TextArea txtDescripcion;
 
     @FXML
-    private Label txtEditorialElegida;
+    private TextField txtEditorialElegida;
 
     @FXML
     private TextField txtEditorialIntroducida;
@@ -76,8 +87,10 @@ public class ControladorLibro implements Initializable{
     
     private ObservableList<String> listaNombreCategoria;
     private ObservableList<String> listaNombreEditorial;
+    private ObservableList<String> listaNombreAutores;
     FilteredList<String> filteredCategoria;
-    FilteredList<String> filterNombres;
+    FilteredList<String> filteredEditorial;
+    FilteredList<String> filteredAutor;
     
     Connection conexion;
     Statement st;
@@ -85,6 +98,8 @@ public class ControladorLibro implements Initializable{
     private ControladorMain cMain;
     private OperacionLibro operacion;
     Libro libroSeleccionado;
+    
+    private ValidationSupport validationSupport;
 
     
     @Override
@@ -103,7 +118,7 @@ public class ControladorLibro implements Initializable{
 
         // Configuración para editoriales
         listaNombreEditorial = FXCollections.observableArrayList();
-        FilteredList<String> filteredEditorial = new FilteredList<>(listaNombreEditorial);
+        filteredEditorial = new FilteredList<>(listaNombreEditorial);
         lstEditoriales.setItems(filteredEditorial);
 
         txtEditorialIntroducida.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -112,6 +127,19 @@ public class ControladorLibro implements Initializable{
                 item.toLowerCase().contains(newValue.toLowerCase())
             );
         });
+        
+        //Configuración para autores
+        listaNombreAutores = FXCollections.observableArrayList();
+        filteredAutor = new FilteredList<>(listaNombreAutores);
+        lstAutores.setItems(filteredAutor);
+
+        txtAutorIntroducido.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredAutor.setPredicate(item ->
+                newValue == null || newValue.isEmpty() ||
+                item.toLowerCase().contains(newValue.toLowerCase())
+            );
+        });
+        
         // Manejador para doble clic en categorías
         lstCategorias.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) { // Verifica doble clic
@@ -131,6 +159,17 @@ public class ControladorLibro implements Initializable{
                 }
             }
         });
+        
+        
+        // Manejador para doble clic en autores
+        lstAutores.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) { // Verifica doble clic
+                String seleccionado = lstAutores.getSelectionModel().getSelectedItem();
+                if (seleccionado != null) {
+                    txtAutorElegido.setText(seleccionado);
+                }
+            }
+        });
     }
     
 
@@ -141,8 +180,8 @@ public class ControladorLibro implements Initializable{
                 this.st = conexion.createStatement();
                 listarCategorias();
                 listarEditoriales();
-                
-                
+                listarAutores();
+                validarCampos();
                 
             }
         } catch (SQLException e) {
@@ -174,11 +213,11 @@ public class ControladorLibro implements Initializable{
                 crearNuevoLibro();
             }
             case EDITAR -> {
+                validationSupport.setErrorDecorationEnabled(false); 
                 editarLibro();
             }
         }
         
-        cerrarVentana(event);
     }
 
     @FXML
@@ -194,9 +233,11 @@ public class ControladorLibro implements Initializable{
         txtDescripcion.setEditable(false);
         lstCategorias.setEditable(false);
         lstEditoriales.setEditable(false);
+        lstAutores.setEditable(false);
         btnAceptar.setVisible(false);
         lstCategorias.setDisable(true);
         lstEditoriales.setDisable(true);
+        lstAutores.setDisable(true);
     }
     private void edicion(){
         rellenarDatos();
@@ -204,12 +245,13 @@ public class ControladorLibro implements Initializable{
         txtISBN.setEditable(false);
     }
     
-    private void crearNuevoLibro() {
+    /*private void crearNuevoLibro() {
         try {
             // Validar campos numéricos
             int totalCopias = Integer.parseInt(txtTotalCopias.getText());
             int idCategoria = obtenerIdCategoriaPorNombre(txtCategoriaElegida.getText());
             int idEditorial = obtenerIdEditorialPorNombre(txtEditorialElegida.getText());
+            int idAutor = obtenerIdAutorPorNombreCompleto(txtAutorElegido.getText());
 
             Libro nuevoLibro = new Libro(
                 0,
@@ -253,8 +295,137 @@ public class ControladorLibro implements Initializable{
         }
         
         cMain.tbvLibros.setItems(cMain.listaTodosLibros());
+    }*/
+    
+    
+    
+    private void crearNuevoLibro() {
+        try {
+            
+            String titulo = txtTitulo.getText().trim();
+
+            // Validar si ya existe un libro con ese título
+            if (existeLibroConTitulo(titulo)) {
+                mostrarAlertaError("Error", "Ya existe un libro con el título: " + titulo);
+                return;  // Salir del método para no crear otro libro igual
+            }
+            
+            int totalCopias = Integer.parseInt(txtTotalCopias.getText().trim());
+            int idCategoria = obtenerIdCategoriaPorNombre(txtCategoriaElegida.getText().trim());
+            int idEditorial = obtenerIdEditorialPorNombre(txtEditorialElegida.getText().trim());
+            int idAutor = obtenerIdAutorPorNombreCompleto(txtAutorElegido.getText().trim());
+
+            Libro nuevoLibro = new Libro(
+                0,
+                txtTitulo.getText().trim(),
+                txtDescripcion.getText().trim(),
+                txtISBN.getText().trim(),
+                totalCopias,
+                totalCopias,
+                idCategoria,
+                idEditorial
+            );
+
+            // Insertar libro
+            String queryLibro = "INSERT INTO libro (titulo, descripcion, ISBN, totalCopias, copiasDisponibles, idCategoria, idEditorial) "
+                              + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            try (PreparedStatement pstLibro = conexion.prepareStatement(queryLibro, Statement.RETURN_GENERATED_KEYS)) {
+                pstLibro.setString(1, nuevoLibro.getTitulo());
+                pstLibro.setString(2, nuevoLibro.getDescripcion());
+                pstLibro.setString(3, nuevoLibro.getISBN());
+                pstLibro.setInt(4, nuevoLibro.getTotalCopias());
+                pstLibro.setInt(5, nuevoLibro.getCopiasDisponibles());
+                pstLibro.setInt(6, nuevoLibro.getIdCategoria());
+                pstLibro.setInt(7, nuevoLibro.getIdEditorial());
+
+                int filasAfectadas = pstLibro.executeUpdate();
+
+                if (filasAfectadas > 0) {
+                    ResultSet generatedKeys = pstLibro.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        int idLibro = generatedKeys.getInt(1);
+
+                        // Insertar relación libro_autor
+                        String queryRelacion = "INSERT INTO libro_Autor (idLibro, idAutor) VALUES (?, ?)";
+                        try (PreparedStatement pstRelacion = conexion.prepareStatement(queryRelacion)) {
+                            pstRelacion.setInt(1, idLibro);
+                            pstRelacion.setInt(2, idAutor);
+                            pstRelacion.executeUpdate();
+                        }
+
+                        mostrarAlertaExito("Éxito", "Libro creado correctamente");
+                    }
+                } else {
+                    mostrarAlertaError("Error", "No se pudo crear el libro");
+                }
+
+            } catch (SQLException e) {
+                mostrarAlertaError("Error de base de datos", e.getMessage());
+            }
+
+        } catch (NumberFormatException e) {
+            mostrarAlertaError("Error", "El número de copias no es válido");
+        }
+
+        cMain.tbvLibros.setItems(cMain.listaTodosLibros());
+    }
+    
+    public boolean existeLibroConTitulo(String titulo) {
+        boolean existe = false;
+
+        if (conexion != null) {
+            String query = "SELECT 1 FROM libro WHERE titulo = ? LIMIT 1";
+
+            try (PreparedStatement ps = conexion.prepareStatement(query)) {
+                ps.setString(1, titulo.trim());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        existe = true;
+                    }
+                }
+
+            } catch (SQLException e) {
+                System.out.println("Excepción SQL: " + e.getMessage());
+            }
+        }
+
+        return existe;
     }
 
+    
+    private void validarCampos() {
+        validationSupport = new ValidationSupport();
+
+        validationSupport.registerValidator(txtTitulo, 
+            Validator.createEmptyValidator("El título es obligatorio"));
+
+        validationSupport.registerValidator(txtISBN, 
+            Validator.createEmptyValidator("El ISBN es obligatorio"));
+
+        validationSupport.registerValidator(txtDescripcion, 
+            Validator.createEmptyValidator("La descripción es obligatoria"));
+
+        validationSupport.registerValidator(txtTotalCopias, true, 
+            Validator.createPredicateValidator(
+                input -> input != null && !input.toString().trim().isEmpty() && input.toString().matches("\\d+"),
+                "Debe ingresar un número en total de copias"));
+        
+        validationSupport.registerValidator(txtCategoriaElegida, 
+            Validator.createEmptyValidator("Debe seleccionar una categoría"));
+
+        validationSupport.registerValidator(txtEditorialElegida, 
+            Validator.createEmptyValidator("Debe seleccionar una editorial"));
+        
+        validationSupport.registerValidator(txtAutorElegido, 
+            Validator.createEmptyValidator("Debe seleccionar un autor"));
+        
+        validationSupport.validationResultProperty().addListener((obs, oldResult, newResult) -> {
+            btnAceptar.setDisable(newResult.getErrors().size() > 0);
+        });
+
+    }
     
     public void mostrarAlertaExito(String titulo, String mensaje) {
         Alert alert = new Alert(AlertType.INFORMATION);
@@ -262,6 +433,9 @@ public class ControladorLibro implements Initializable{
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+        
+        Stage stage = (Stage) btnAceptar.getScene().getWindow();
+        stage.close();
     }
 
     private void mostrarAlertaError(String titulo, String mensaje) {
@@ -272,7 +446,7 @@ public class ControladorLibro implements Initializable{
         alert.showAndWait();
     }
     
-    private void editarLibro() throws SQLException {
+    /*private void editarLibro() throws SQLException {
         try {
             // Validar que hay un libro seleccionado
             if (libroSeleccionado == null) {
@@ -347,7 +521,120 @@ public class ControladorLibro implements Initializable{
         } catch (NumberFormatException e) {
             mostrarAlertaError("Error numérico", "Verifique los campos numéricos");
         }
+    }*/
+    
+    private void editarLibro() throws SQLException {
+        try {
+            // Validar que hay un libro seleccionado
+            if (libroSeleccionado == null) {
+                mostrarAlertaError("Error", "No hay ningún libro seleccionado");
+                return;
+            }
+
+            // Validar campos numéricos
+            int totalCopias = Integer.parseInt(txtTotalCopias.getText().trim());
+            int idCategoria = obtenerIdCategoriaPorNombre(txtCategoriaElegida.getText().trim());
+            int idEditorial = obtenerIdEditorialPorNombre(txtEditorialElegida.getText().trim());
+            int idAutorNuevo = obtenerIdAutorPorNombreCompleto(txtAutorElegido.getText().trim());
+
+            // Obtener copias ya reservadas
+            int copiasReservadas = obtenerCopiasReservadas(libroSeleccionado.getIdLibro());
+
+            // Validar que no se reduzca por debajo de las copias reservadas
+            if (totalCopias < copiasReservadas) {
+                mostrarAlertaError("Error de validación",
+                    "No se puede establecer un número de copias menor a las ya reservadas (" + copiasReservadas + ").");
+                return;
+            }
+
+            // Actualizar el objeto libro
+            libroSeleccionado.setTitulo(txtTitulo.getText().trim());
+            libroSeleccionado.setDescripcion(txtDescripcion.getText().trim());
+            libroSeleccionado.setISBN(txtISBN.getText().trim());
+            libroSeleccionado.setTotalCopias(totalCopias);
+            libroSeleccionado.setIdCategoria(idCategoria);
+            libroSeleccionado.setIdEditorial(idEditorial);
+
+            // Query de actualización del libro
+            String queryLibro = "UPDATE libro SET "
+                    + "titulo = ?, "
+                    + "descripcion = ?, "
+                    + "ISBN = ?, "
+                    + "totalCopias = ?, "
+                    + "idCategoria = ?, "
+                    + "idEditorial = ? "
+                    + "WHERE idLibro = ?";
+
+            try (PreparedStatement pstLibro = conexion.prepareStatement(queryLibro)) {
+                pstLibro.setString(1, libroSeleccionado.getTitulo());
+                pstLibro.setString(2, libroSeleccionado.getDescripcion());
+                pstLibro.setString(3, libroSeleccionado.getISBN());
+                pstLibro.setInt(4, libroSeleccionado.getTotalCopias());
+                pstLibro.setInt(5, libroSeleccionado.getIdCategoria());
+                pstLibro.setInt(6, libroSeleccionado.getIdEditorial());
+                pstLibro.setInt(7, libroSeleccionado.getIdLibro());
+
+                int filasAfectadasLibro = pstLibro.executeUpdate();
+
+                if (filasAfectadasLibro > 0) {
+                    // Actualizar relación libro_Autor solo si el autor cambió
+                    // Primero obtenemos el idAutor actual asociado
+                    int idAutorActual = obtenerIdAutorPorIdLibro(libroSeleccionado.getIdLibro());
+
+                    if (idAutorActual != idAutorNuevo) {
+                        // Actualizamos la tabla intermedia libro_Autor
+                        String queryActualizarAutor = "UPDATE libro_Autor SET idAutor = ? WHERE idLibro = ?";
+                        try (PreparedStatement pstAutor = conexion.prepareStatement(queryActualizarAutor)) {
+                            pstAutor.setInt(1, idAutorNuevo);
+                            pstAutor.setInt(2, libroSeleccionado.getIdLibro());
+
+                            pstAutor.executeUpdate();
+                        }
+                    }
+
+                    mostrarAlertaExito("Éxito", "Libro actualizado correctamente");
+
+                    // Cerrar ventana de edición
+                    Stage stage = (Stage) btnAceptar.getScene().getWindow();
+                    stage.close();
+
+                    // Actualizar tabla principal
+                    cMain.tbvLibros.setItems(cMain.listaTodosLibros());
+                } else {
+                    mostrarAlertaError("Error", "No se pudo actualizar el libro");
+                }
+            } catch (SQLException e) {
+                mostrarAlertaError("Error de base de datos", e.getMessage());
+            }
+
+        } catch (NumberFormatException e) {
+            mostrarAlertaError("Error numérico", "Verifique los campos numéricos");
+        }
     }
+
+    public int obtenerIdAutorPorIdLibro(int idLibro) {
+        int idAutor = -1; // Valor por defecto si no encuentra nada
+
+        if (conexion != null) {
+            String query = "SELECT idAutor FROM libro_Autor WHERE idLibro = ? LIMIT 1";
+
+            try (PreparedStatement ps = conexion.prepareStatement(query)) {
+                ps.setInt(1, idLibro);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        idAutor = rs.getInt("idAutor");
+                    }
+                }
+
+            } catch (SQLException e) {
+                System.out.println("Excepción SQL: " + e.getMessage());
+            }
+        }
+
+        return idAutor;
+    }
+
     
     private void rellenarDatos(){
         txtTitulo.setText(libroSeleccionado.getTitulo());
@@ -356,6 +643,7 @@ public class ControladorLibro implements Initializable{
         txtTotalCopias.setText(String.valueOf(libroSeleccionado.getTotalCopias()));
         txtCategoriaElegida.setText(obtenerNombreCategoriaPorId(libroSeleccionado.getIdCategoria()));
         txtEditorialElegida.setText(obtenerNombreEditorialPorId(libroSeleccionado.getIdEditorial()));
+        txtAutorElegido.setText(obtenerNombreAutorPorIdLibro(libroSeleccionado.getIdLibro()));
     }
     
     private void listarCategorias() {
@@ -440,8 +728,41 @@ public class ControladorLibro implements Initializable{
         return nombreEditorial;
     }
     
+    public String obtenerNombreAutorPorIdLibro(int idLibro) {
+        String nombreAutor = null;
+
+        if (conexion != null) {
+            String query = "SELECT a.nombreAutor, a.apellidoAutor " +
+                           "FROM autor a " +
+                           "JOIN libro_Autor la ON a.idAutor = la.idAutor " +
+                           "WHERE la.idLibro = ? LIMIT 1";
+
+            try {
+                PreparedStatement ps = conexion.prepareStatement(query);
+                ps.setInt(1, idLibro);
+
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    nombreAutor = rs.getString("nombreAutor") + " " + rs.getString("apellidoAutor");
+                }
+
+                rs.close();
+                ps.close();
+
+            } catch (SQLException e) {
+                System.out.println("Excepción SQL: " + e.getMessage());
+            }
+        }
+
+        return nombreAutor;
+    }
+
+
+
+    
     public int obtenerIdCategoriaPorNombre(String nombreCategoria) {
-        int idCategoria = -1; // Valor por defecto si no encuentra
+        int idCategoria = -1;
 
         if (conexion != null) {
             String query = "SELECT idCategoria FROM categoria WHERE nombreCategoria = ?";
@@ -459,6 +780,32 @@ public class ControladorLibro implements Initializable{
             }
         }
         return idCategoria;
+    }
+    
+    public int obtenerIdAutorPorNombreCompleto(String nombreCompleto) {
+        int idAutor = -1;
+
+        if (conexion != null && nombreCompleto != null && !nombreCompleto.isEmpty()) {
+            // Separar nombre y apellido
+            String[] partes = nombreCompleto.split(" ", 2);
+            if (partes.length < 2) return -1; // Si no tiene ambos componentes
+
+            String query = "SELECT idAutor FROM autor WHERE nombreAutor = ? AND apellidoAutor = ?";
+
+            try (PreparedStatement ps = conexion.prepareStatement(query)) {
+                ps.setString(1, partes[0]);    // Nombre
+                ps.setString(2, partes[1]);    // Apellido
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        idAutor = rs.getInt("idAutor");
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println("Error obteniendo ID autor: " + e.getMessage());
+            }
+        }
+        return idAutor;
     }
 
     public int obtenerIdEditorialPorNombre(String nombreEditorial) {
@@ -491,6 +838,22 @@ public class ControladorLibro implements Initializable{
                 rs = st.executeQuery(query);
                 while (rs.next()) {
                     listaNombreEditorial.add(rs.getString("nombreEditorial"));
+                }
+            } catch (SQLException e) {
+                System.out.println("Excepción SQL: " + e.getMessage());
+            }
+        }
+    }
+    
+    private void listarAutores() {
+        listaNombreAutores.clear();
+
+        if (conexion != null) {
+            String query = "SELECT CONCAT(nombreAutor, ' ', apellidoAutor) AS nombreCompleto FROM autor";
+            try {
+                rs = st.executeQuery(query);
+                while (rs.next()) {
+                    listaNombreAutores.add(rs.getString("nombreCompleto"));
                 }
             } catch (SQLException e) {
                 System.out.println("Excepción SQL: " + e.getMessage());

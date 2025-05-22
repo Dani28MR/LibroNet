@@ -92,7 +92,6 @@ public class ControladorCategoria implements Initializable{
         }
 
         try {
-            // 3. Comprobar si ya existe una categoría con ese nombre
             String queryCheck = "SELECT COUNT(*) FROM categoria WHERE nombreCategoria = ?";
             try (PreparedStatement pstCheck = conexion.prepareStatement(queryCheck)) {
                 pstCheck.setString(1, nombreCat);
