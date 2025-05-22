@@ -73,13 +73,13 @@ public class ControladorLogin implements Initializable{
             System.out.println("Error en la conexión");
         }
         
-        String password = "admin";
+        String password = "aDmin123";
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         System.out.println(hashedPassword);
         
-        String pass = "123";
+        String pass = "uSuario123";
         String has = BCrypt.hashpw(pass, BCrypt.gensalt());
-        System.out.println(has);
+        System.out.println("Esta es la nueva contraseña de los usuarios" + has);
         obtenerListaUsuarios();
         System.out.println(listaUsuarios.size());
         

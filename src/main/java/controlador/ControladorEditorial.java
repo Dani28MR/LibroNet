@@ -99,11 +99,11 @@ public class ControladorEditorial implements Initializable {
             Validator.createEmptyValidator("La dirección es obligatori"));
 
         validationSupport.registerValidator(txtTelefono, true, (Control c, String value) -> {
-        boolean isValid = value != null && value.matches("\\d{9}");
-            ValidationMessage message = isValid
-                ? null
-                : ValidationMessage.error(c, "El teléfono es obligatorio y debe tener 9 dígitos (ej: 612345678)");
-            return ValidationResult.fromMessages(message);
+            boolean isValid = value != null && value.matches("\\d{9}");
+                ValidationMessage message = isValid
+                    ? null
+                    : ValidationMessage.error(c, "El teléfono es obligatorio y debe tener 9 dígitos (ej: 612345678)");
+                return ValidationResult.fromMessages(message);
         });
         
         validationSupport.validationResultProperty().addListener((obs, oldResult, newResult) -> {

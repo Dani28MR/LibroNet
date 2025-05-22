@@ -15,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -28,6 +29,10 @@ import static modelo.Modo.VER;
 import modelo.OperacionUsuario;
 import modelo.RolUsuario;
 import modelo.Usuario;
+import org.controlsfx.validation.ValidationMessage;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class ControladorUsuario implements Initializable{
@@ -75,6 +80,7 @@ public class ControladorUsuario implements Initializable{
     private OperacionUsuario operacion;
     Usuario usuarioSeleccionado;
     File rutaImg;
+    private ValidationSupport validationSupport;
     
     
     @Override
@@ -89,6 +95,7 @@ public class ControladorUsuario implements Initializable{
                 crearNuevoUsuario();
             }
             case EDITAR -> {
+                validationSupport.setErrorDecorationEnabled(false); 
                 editarUsuario();
             }
         }
@@ -141,40 +148,23 @@ public class ControladorUsuario implements Initializable{
 
         
         
-        if (nombre.isEmpty() || apellido.isEmpty() || email.isEmpty() || password.isEmpty() || rutaImg == null) {
-            mostrarAlertaError("Error", "Nombre, apellido, email, contraseña y la imágen del usuario son campos obligatorios");
+        if (rutaImg == null) {
+            mostrarAlertaError("Error", "La imágen del usuario es  obligatoria");
             return;
         }
         
         String imagen = rutaImg.getAbsolutePath();
 
-        if (password.length() < 8) {
-            mostrarAlertaError("Contraseña débil", "La contraseña debe tener al menos 8 caracteres");
-            return;
-        }
-
-        if (!password.equals(confirmacionPassword)) {
-            mostrarAlertaError("Error", "Las contraseñas no coinciden");
-            return;
-        }
-
-        if (!email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            mostrarAlertaError("Email inválido", "Formato de email incorrecto");
-            return;
-        }
+        
 
         try {
-            String queryCheck = "SELECT COUNT(*) FROM usuario WHERE nombreUsuario = ? AND apellidoUsuario = ?";
-            try (PreparedStatement pstCheck = conexion.prepareStatement(queryCheck)) {
-                pstCheck.setString(1, nombre);
-                pstCheck.setString(2, apellido);
+            String queryCheckEmail = "SELECT COUNT(*) FROM usuario WHERE email = ?";
+            try (PreparedStatement pstCheckEmail = conexion.prepareStatement(queryCheckEmail)) {
+                pstCheckEmail.setString(1, email);
 
-                ResultSet rs = pstCheck.executeQuery();
+                ResultSet rs = pstCheckEmail.executeQuery();
                 if (rs.next() && rs.getInt(1) > 0) {
-                    mostrarAlertaError(
-                        "Usuario existente",
-                        "Ya existe un usuario con el nombre '" + nombre + " " + apellido + "'"
-                    );
+                    mostrarAlertaError("Email ya registrado", "Ya existe una cuenta registrada con el email: " + email);
                     return;
                 }
             }
@@ -210,6 +200,7 @@ public class ControladorUsuario implements Initializable{
         cMain.tbvUsuarios.setItems(cMain.listaTodosUsuarios());
     }
     
+    
     private void editarUsuario() {
         try {
             if (usuarioSeleccionado == null) {
@@ -222,23 +213,10 @@ public class ControladorUsuario implements Initializable{
             String apellido = txtApellidos.getText().trim();
             String email = txtEmail.getText().trim();
             String nuevoPassword = txtPassword.getText();
-            String confirmacionPassword = txtPasswordConfirmacion.getText();
             String telefono = txtTelefono.getText().trim();
             String direccion = txtDireccion.getText().trim();
             String rol = usuarioSeleccionado.getRol().toString();
-            String imagenBase64 = usuarioSeleccionado.getImagenUsuario();
 
-            // Validación de campos obligatorios
-            if (nombre.isEmpty() || apellido.isEmpty() || email.isEmpty()) {
-                mostrarAlertaError("Error", "Nombre, apellido y email son campos obligatorios");
-                return;
-            }
-
-            // Validación formato email
-            if (!email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-                mostrarAlertaError("Email inválido", "Formato de email incorrecto");
-                return;
-            }
 
             // Verificar si el email ya existe en otro usuario
             if (!email.equals(usuarioSeleccionado.getEmail())) {
@@ -255,33 +233,22 @@ public class ControladorUsuario implements Initializable{
             }
 
             // Manejo de contraseña
-            String hashedPassword = usuarioSeleccionado.getContraseña();
-            if (!nuevoPassword.isEmpty()) {
-                if (nuevoPassword.length() < 8) {
-                    mostrarAlertaError("Contraseña débil", "La contraseña debe tener al menos 8 caracteres");
-                    return;
-                }
+            String hashedPassword = BCrypt.hashpw(nuevoPassword, BCrypt.gensalt());
+            String imagen;
 
-                if (!nuevoPassword.equals(confirmacionPassword)) {
-                    mostrarAlertaError("Error", "Las contraseñas no coinciden");
-                    return;
-                }
-
-                hashedPassword = BCrypt.hashpw(nuevoPassword, BCrypt.gensalt());
-            }
-
-            // Manejo de imagen
             if (rutaImg != null) {
-                imagenBase64 = cMain.convertirImagenA64(rutaImg);
+                imagen = cMain.convertirImagenA64(rutaImg);
+            } else {
+                imagen = usuarioSeleccionado.getImagenUsuario();
             }
 
-            // Actualización en base de datos
             String sqlUpdate = "UPDATE usuario SET "
                     + "nombreUsuario = ?, "
                     + "apellidoUsuario = ?, "
                     + "imagenUsuario = ?, "
                     + "email = ?, "
                     + "contraseña = ?, "
+                    + "cofirmacionContraseña = ?, "
                     + "telefono = ?, "
                     + "direccion = ?, "
                     + "rol = ? "
@@ -290,13 +257,14 @@ public class ControladorUsuario implements Initializable{
             try (PreparedStatement pst = conexion.prepareStatement(sqlUpdate)) {
                 pst.setString(1, nombre);
                 pst.setString(2, apellido);
-                pst.setString(3, imagenBase64);
+                pst.setString(3, imagen);
                 pst.setString(4, email);
                 pst.setString(5, hashedPassword);
-                pst.setString(6, telefono.isEmpty() ? null : telefono);
-                pst.setString(7, direccion.isEmpty() ? null : direccion);
-                pst.setString(8, rol);
-                pst.setInt(9, idUsuario);
+                pst.setString(6, hashedPassword);
+                pst.setString(7, telefono.isEmpty() ? null : telefono);
+                pst.setString(8, direccion.isEmpty() ? null : direccion);
+                pst.setString(9, rol);
+                pst.setInt(10, idUsuario);
 
                 int filasAfectadas = pst.executeUpdate();
                 if (filasAfectadas > 0) {
@@ -317,11 +285,62 @@ public class ControladorUsuario implements Initializable{
             conexion = ConexionSingleton.obtenerConexion();
             if (conexion != null) {
                 this.st = conexion.createStatement();
-                
+                validarCampos();
             }
         } catch (SQLException e) {
             System.out.println("Error en la conexión: " + e.getMessage());
         }
+    }
+    
+    private void validarCampos() {
+        validationSupport = new ValidationSupport();
+
+        validationSupport.registerValidator(txtNombre, 
+            Validator.createEmptyValidator("El nombre es obligatorio"));
+
+        validationSupport.registerValidator(txtApellidos, 
+            Validator.createEmptyValidator("Los apellidos es obligatorio"));
+
+        validationSupport.registerValidator(txtEmail, true, (Control c, String value) -> {
+            boolean isValid = value != null && value.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$");
+            ValidationMessage message = isValid
+                ? null
+                : ValidationMessage.error(c, "Introduce un email válido (ejemplo: usuario@correo.com)");
+            return ValidationResult.fromMessages(message);
+        });
+        
+        validationSupport.registerValidator(txtTelefono, true, (Control c, String value) -> {
+            boolean isValid = value != null && value.matches("\\d{9}");
+                ValidationMessage message = isValid
+                    ? null
+                    : ValidationMessage.error(c, "El teléfono es obligatorio y debe tener 9 dígitos (ej: 612345678)");
+                return ValidationResult.fromMessages(message);
+        });
+        
+        validationSupport.registerValidator(txtDireccion, 
+            Validator.createEmptyValidator("La dirección es obligatoria"));
+        
+        validationSupport.registerValidator(txtPassword, true, (Control c, String value) -> {
+            boolean isValid = value != null && value.length() >= 6 && value.matches(".*[A-Z].*");
+            ValidationMessage message = isValid
+                ? null
+                : ValidationMessage.error(c, "La contraseña debe tener al menos 6 caracteres y una mayúscula (ej: Abcd1234)");
+            return ValidationResult.fromMessages(message);
+        });
+
+        validationSupport.registerValidator(txtPasswordConfirmacion, true, (Control c, String value) -> {
+            String password = txtPassword.getText();
+            boolean isValid = value != null && value.equals(password);
+            ValidationMessage message = isValid
+                ? null
+                : ValidationMessage.error(c, "Las contraseñas no coinciden");
+            return ValidationResult.fromMessages(message);
+        });
+
+        
+        validationSupport.validationResultProperty().addListener((obs, oldResult, newResult) -> {
+            btnAceptar.setDisable(newResult.getErrors().size() > 0);
+        });
     }
     
     public void setControladorMain(ControladorMain cMain) {
