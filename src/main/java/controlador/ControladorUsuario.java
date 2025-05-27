@@ -1,13 +1,17 @@
 
 package controlador;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Base64;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -81,6 +85,7 @@ public class ControladorUsuario implements Initializable{
     Usuario usuarioSeleccionado;
     File rutaImg;
     private ValidationSupport validationSupport;
+    private Boolean crearUs = false;
     
     
     @Override
@@ -177,7 +182,7 @@ public class ControladorUsuario implements Initializable{
             try (PreparedStatement pstIns = conexion.prepareStatement(queryInsert)) {
                 pstIns.setString(1, nombre);
                 pstIns.setString(2, apellido);
-                pstIns.setString(3, cMain.convertirImagenA64(rutaImg));
+                pstIns.setString(3, convertirImagenA64(rutaImg));
                 pstIns.setString(4, email);
                 pstIns.setString(5, hashedPassword);
                 pstIns.setString(6, hashedPassword);
@@ -196,8 +201,28 @@ public class ControladorUsuario implements Initializable{
         } catch (SQLException e) {
             mostrarAlertaError("Error de base de datos", e.getMessage());
         }
-
-        cMain.tbvUsuarios.setItems(cMain.listaTodosUsuarios());
+        
+        if (!crearUs) {
+            cMain.tbvUsuarios.setItems(cMain.listaTodosUsuarios());
+        }
+    }
+    
+    public String convertirImagenA64(File archivoImagen) {
+        try (
+            FileInputStream fileInputStream = new FileInputStream(archivoImagen);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
+        ) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            }
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+            return Base64.getEncoder().encodeToString(imageBytes); 
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
     
     
@@ -348,8 +373,9 @@ public class ControladorUsuario implements Initializable{
         initDatos();
     }
     
-    public void setControladorLogin(ControladorLogin cLogin) {
+    public void setControladorLogin(ControladorLogin cLogin,Boolean b) {
         this.cLogin = cLogin;
+        this.crearUs = b;
         initDatos();
     }
     public void setOperacion(OperacionUsuario operacion) {

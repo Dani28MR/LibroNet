@@ -1546,12 +1546,9 @@ public class ControladorMain implements Initializable{
         imgUsuario.setFitHeight(100);
         imgUsuario.setPreserveRatio(true);
         
-        if (usuarioLog.getIdUsuario() != 1) {
+        if (usuarioLog.getRol() != RolUsuario.ADMINISTRADOR) {
             tabUsuarios.setDisable(true);
             tabReservas.setDisable(true);
-        }else{
-            //opcReservas.setDisable(true);
-            
         }
         
     }

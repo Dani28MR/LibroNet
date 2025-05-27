@@ -135,7 +135,7 @@ public class ControladorLogin implements Initializable{
         Parent root = loader.load();
 
         ControladorUsuario controladorUsuario = loader.getController();
-        controladorUsuario.setControladorLogin(this);
+        controladorUsuario.setControladorLogin(this,true);
         controladorUsuario.setOperacion(operacion);
         
         Stage stage = new Stage();
