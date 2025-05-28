@@ -32,9 +32,9 @@ dependencies {
 
     implementation 'org.mindrot:jbcrypt:0.4'
 
-    implementation'net.sf.jasperreports:jasperreports:7.0.1'
+    /*implementation'net.sf.jasperreports:jasperreports:7.0.1'
     implementation'net.sf.jasperreports:jasperreports-pdf:7.0.0'
-    implementation'net.sf.jasperreports:jasperreports-charts:7.0.1'
+    implementation'net.sf.jasperreports:jasperreports-charts:7.0.1'*/
 
 }
 

@@ -102,7 +102,6 @@ public class ControladorLogin implements Initializable{
         }else{
             System.out.println("usuario encontrado y se llama: "+usuarioLogin.getNombreUsuario());
             System.out.println(""+BCrypt.checkpw(password, usuarioLogin.getContraseña()));
-            //abrirVentanaVenta();
         }
         try {
             FXMLLoader loader = new FXMLLoader(

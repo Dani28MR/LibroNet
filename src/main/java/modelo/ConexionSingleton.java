@@ -40,7 +40,7 @@ public class ConexionSingleton {
             IP = (String) properties.get("IP");
         } catch (FileNotFoundException e) {
             System.out.println("No se pudo encontrar el archivo de propiedades para IP, se establece localhost por defecto");
-            IP = "localhost";
+            IP = "34.237.81.204";
         }
 
         InputStream input = ConexionSingleton.class.getClassLoader().getResourceAsStream("bbdd.properties");
@@ -52,7 +52,7 @@ public class ConexionSingleton {
             PORT = properties.getProperty("PORT", "3306");
             BBDD = properties.getProperty("BBDD", "LibroNet");
             USER = properties.getProperty("USER", "admin");
-            PWD = properties.getProperty("PWD", "8gYrziQ19Vmt");
+            PWD = properties.getProperty("PWD", "a1u4HcLMHupH");
 
             
             Connection conn;

@@ -950,7 +950,7 @@ public class ControladorMain implements Initializable{
         stage.showAndWait();
     }
     
-    private void eliminarUsuario() {
+    /*private void eliminarUsuario() {
         try {
             if (usuarioSeleccionado == null) {
                 mostrarAlertaError("Error", "No hay ningún usuario seleccionado para eliminar");
@@ -994,6 +994,82 @@ public class ControladorMain implements Initializable{
                     int filasAfectadas = pstDel.executeUpdate();
 
                     if (filasAfectadas > 0) {
+                        mostrarAlertaExito("Éxito", "Usuario eliminado correctamente");
+                        tbvUsuarios.setItems(listaTodosUsuarios());
+                    } else {
+                        mostrarAlertaError("Error", "No se pudo eliminar el usuario");
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            mostrarAlertaError("Error de base de datos", e.getMessage());
+        }
+    }*/
+    private void eliminarUsuario() {
+        try {
+            if (usuarioSeleccionado == null) {
+                mostrarAlertaError("Error", "No hay ningún usuario seleccionado para eliminar");
+                return;
+            }
+
+            String emailUsuario = usuarioSeleccionado.getEmail();
+            if ("admin@admin.com".equalsIgnoreCase(emailUsuario)) {
+                mostrarAlertaError("Acción no permitida", "No se puede eliminar la cuenta administradora.");
+                return;
+            }
+
+            int idUsuario = usuarioSeleccionado.getIdUsuario();
+
+            // Verificar si tiene reservas activas
+            String sqlReservasActivas = "SELECT COUNT(*) FROM reserva WHERE idUsuario = ? AND estado = 'ACTIVO'";
+            try (PreparedStatement pstActivas = conexion.prepareStatement(sqlReservasActivas)) {
+                pstActivas.setInt(1, idUsuario);
+                ResultSet rs = pstActivas.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    mostrarAlertaError("No permitido", "Este usuario tiene reservas activas y no puede ser eliminado.");
+                    return;
+                }
+            }
+
+            // Verificar si tiene reservas inactivas
+            String sqlReservasInactivas = "SELECT COUNT(*) FROM reserva WHERE idUsuario = ? AND estado != 'ACTIVO'";
+            boolean tieneInactivas = false;
+            try (PreparedStatement pstInactivas = conexion.prepareStatement(sqlReservasInactivas)) {
+                pstInactivas.setInt(1, idUsuario);
+                ResultSet rs = pstInactivas.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    tieneInactivas = true;
+                }
+            }
+
+            // Confirmación con advertencia de reservas inactivas
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar eliminación");
+            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el usuario?");
+            String mensaje = tieneInactivas
+                ? "Este usuario tiene reservas inactivas que serán eliminadas.\n¡Esta acción no se puede deshacer!"
+                : "¡Esta acción no se puede deshacer!";
+            confirmacion.setContentText(mensaje);
+
+            Optional<ButtonType> resultado = confirmacion.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+
+                // Eliminar reservas inactivas si las hay
+                if (tieneInactivas) {
+                    String sqlBorrarInactivas = "DELETE FROM reserva WHERE idUsuario = ? AND estado != 'ACTIVO'";
+                    try (PreparedStatement pstDelInactivas = conexion.prepareStatement(sqlBorrarInactivas)) {
+                        pstDelInactivas.setInt(1, idUsuario);
+                        pstDelInactivas.executeUpdate();
+                    }
+                }
+
+                // Eliminar el usuario
+                String sqlEliminarUsuario = "DELETE FROM usuario WHERE idUsuario = ?";
+                try (PreparedStatement pstEliminar = conexion.prepareStatement(sqlEliminarUsuario)) {
+                    pstEliminar.setInt(1, idUsuario);
+                    int filas = pstEliminar.executeUpdate();
+                    if (filas > 0) {
                         mostrarAlertaExito("Éxito", "Usuario eliminado correctamente");
                         tbvUsuarios.setItems(listaTodosUsuarios());
                     } else {
