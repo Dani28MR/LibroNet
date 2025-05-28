@@ -319,6 +319,7 @@ public class ControladorMain implements Initializable{
     
     @FXML
     public TableView<Usuario> tbvUsuarioReserva;
+    
     @FXML
     public TableView<Libro> tbvLibrosReserva;
     
@@ -342,6 +343,9 @@ public class ControladorMain implements Initializable{
     
     @FXML
     private Button btnReservarAdmin;
+    
+    @FXML
+    private Button btnCancelarReservarAdmin;
     
     
     Connection conexion;
@@ -517,8 +521,33 @@ public class ControladorMain implements Initializable{
     }
     
     private void verificarSeleccion() {
-        btnReservarAdmin.setDisable(usuarioSeleccionadoReserva == null || libroSeleccionadoReserva == null);
+    boolean usuarioYLibroSeleccionados = usuarioSeleccionadoReserva != null && libroSeleccionadoReserva != null;
+        if (usuarioYLibroSeleccionados) {
+            boolean existeReservaActiva = existeReservaActiva(usuarioSeleccionadoReserva.getIdUsuario(),
+                                                              libroSeleccionadoReserva.getIdLibro());
+
+            btnReservarAdmin.setDisable(!usuarioYLibroSeleccionados);
+            btnCancelarReservarAdmin.setDisable(!existeReservaActiva);
+        } else {
+            btnReservarAdmin.setDisable(true);
+            btnCancelarReservarAdmin.setDisable(true);
+        }
     }
+    private boolean existeReservaActiva(int idUsuario, int idLibro) {
+        String sql = "SELECT COUNT(*) FROM reserva WHERE idUsuario = ? AND idLibro = ? AND estado = 'ACTIVO'";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, idUsuario);
+            ps.setInt(2, idLibro);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            mostrarAlertaError("Error", "No se pudo comprobar si existe una reserva");
+        }
+        return false;
+    }
+
        
     /*
         BOTONES APARTADO LIBRO
@@ -590,7 +619,15 @@ public class ControladorMain implements Initializable{
                     if (filasAfectadas > 0) {
                         mostrarAlertaExito("Éxito", "Libro eliminado correctamente");
                         tbvLibros.setItems(listaTodosLibros());
-
+                        
+                        tbvLibros.getSelectionModel().clearSelection();
+                        tbvLibros.getFocusModel().focus(null);
+                        btnBorrarLibros.setDisable(true);
+                        btnEditarLibros.setDisable(true);
+                        btnVerLibros.setDisable(true);
+                        btnReservarLibros.setDisable(true);
+                        
+                        tbvLibrosReserva.setItems(listaLibrosDisponibles());
                         
                     } else {
                         mostrarAlertaError("Error", "No se pudo eliminar el libro");
@@ -727,6 +764,7 @@ public class ControladorMain implements Initializable{
                         mostrarAlertaExito("Éxito", "Autor eliminado correctamente");
                         // Actualizar la tabla de autores
                         tbvAutores.setItems(listaTodosAutores());
+                        
                     } else {
                         mostrarAlertaError("Error", "No se pudo eliminar el autor");
                     }
@@ -814,6 +852,12 @@ public class ControladorMain implements Initializable{
                     if (filasAfectadas > 0) {
                         mostrarAlertaExito("Éxito", "Editorial eliminada correctamente");
                         tbvEditoriales.setItems(listaTodasEditoriales());
+                        
+                        tbvEditoriales.getSelectionModel().clearSelection();
+                        tbvEditoriales.getFocusModel().focus(null);
+                        btnBorrarEditoriales.setDisable(true);
+                        btnEditarEditoriales.setDisable(true);
+                        btnVerEditoriales.setDisable(true);
                     } else {
                         mostrarAlertaError("Error", "No se pudo eliminar la editorial");
                     }
@@ -896,6 +940,10 @@ public class ControladorMain implements Initializable{
                     if (filasAfectadas > 0) {
                         mostrarAlertaExito("Éxito", "Categoría eliminada correctamente");
                         tbvCategorias.setItems(listaTodasCategorias());
+                        tbvCategorias.getSelectionModel().clearSelection();
+                        tbvCategorias.getFocusModel().focus(null);
+                        btnBorrarCategorias.setDisable(true);
+                        btnVerCategorias.setDisable(true);
                     } else {
                         mostrarAlertaError("Error", "No se pudo eliminar la categoría");
                     }
@@ -922,7 +970,7 @@ public class ControladorMain implements Initializable{
     }
     @FXML
     void btnAccionAddUsuarios(ActionEvent event) throws IOException {
-        abrirVentanaUsuario(new OperacionUsuario(Modo.ADD, usuarioSeleccionado),"Añadir");
+        abrirVentanaUsuario(new OperacionUsuario(Modo.ADD, null),"Añadir");
     }
 
     @FXML
@@ -950,62 +998,6 @@ public class ControladorMain implements Initializable{
         stage.showAndWait();
     }
     
-    /*private void eliminarUsuario() {
-        try {
-            if (usuarioSeleccionado == null) {
-                mostrarAlertaError("Error", "No hay ningún usuario seleccionado para eliminar");
-                return;
-            }
-
-            // Comprobar si el usuario seleccionado es el administrador
-            String emailUsuario = usuarioSeleccionado.getEmail();
-            if ("admin@admin.com".equalsIgnoreCase(emailUsuario)) {
-                mostrarAlertaError("Acción no permitida", "No se puede eliminar la cuenta administradora.");
-                return;
-            }
-
-            int idUsuario = usuarioSeleccionado.getIdUsuario();
-
-            // Verificar si el usuario tiene reservas activas
-            String sqlCheck = "SELECT COUNT(*) FROM reserva WHERE idUsuario = ? AND estado = 'ACTIVO'";
-            try (PreparedStatement pstCheck = conexion.prepareStatement(sqlCheck)) {
-                pstCheck.setInt(1, idUsuario);
-                ResultSet rs = pstCheck.executeQuery();
-                if (rs.next() && rs.getInt(1) > 0) {
-                    mostrarAlertaError(
-                        "No permitido",
-                        "Este usuario no puede ser eliminado porque tiene reservas activas."
-                    );
-                    return;
-                }
-            }
-
-            // Confirmación de eliminación
-            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmacion.setTitle("Confirmar eliminación");
-            confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el usuario?");
-            confirmacion.setContentText("¡Esta acción no se puede deshacer!");
-
-            Optional<ButtonType> resultado = confirmacion.showAndWait();
-            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                String sqlDelete = "DELETE FROM usuario WHERE idUsuario = ?";
-                try (PreparedStatement pstDel = conexion.prepareStatement(sqlDelete)) {
-                    pstDel.setInt(1, idUsuario);
-                    int filasAfectadas = pstDel.executeUpdate();
-
-                    if (filasAfectadas > 0) {
-                        mostrarAlertaExito("Éxito", "Usuario eliminado correctamente");
-                        tbvUsuarios.setItems(listaTodosUsuarios());
-                    } else {
-                        mostrarAlertaError("Error", "No se pudo eliminar el usuario");
-                    }
-                }
-            }
-
-        } catch (SQLException e) {
-            mostrarAlertaError("Error de base de datos", e.getMessage());
-        }
-    }*/
     private void eliminarUsuario() {
         try {
             if (usuarioSeleccionado == null) {
@@ -1072,6 +1064,14 @@ public class ControladorMain implements Initializable{
                     if (filas > 0) {
                         mostrarAlertaExito("Éxito", "Usuario eliminado correctamente");
                         tbvUsuarios.setItems(listaTodosUsuarios());
+                        tbvUsuarios.getSelectionModel().clearSelection();
+                        tbvUsuarios.getFocusModel().focus(null);
+                        btnBorrarUsuarios.setDisable(true);
+                        btnEditarUsuarios.setDisable(true);
+                        btnVerUsuarios.setDisable(true);
+                       
+                        
+                        tbvUsuarioReserva.setItems(listaTodosUsuarios());
                     } else {
                         mostrarAlertaError("Error", "No se pudo eliminar el usuario");
                     }
@@ -1100,7 +1100,6 @@ public class ControladorMain implements Initializable{
                 usuario.setImagenUsuario(rs.getString("imagenUsuario")); // Asumiendo que es una URL o base64
                 usuario.setEmail(rs.getString("email"));
                 usuario.setContraseña(rs.getString("contraseña"));
-                usuario.setCofirmacionContraseña(rs.getString("cofirmacionContraseña"));
                 usuario.setTelefono(rs.getString("telefono"));
                 usuario.setDireccion(rs.getString("direccion"));
                 usuario.setRol(RolUsuario.valueOf(rs.getString("rol")));
@@ -1127,16 +1126,6 @@ public class ControladorMain implements Initializable{
     void btnAccionCancelarReserva(ActionEvent event) {
         cancelarReservaDeLibroSeleccionado();
     }
-    
-    
-    //BOTONES RESERVA ADMINISTRADOR
-    @FXML
-    void btnAccionReservarAdmin(ActionEvent event) {
-        reservarLibroAUsuarioPorAdministrador(libroSeleccionadoReserva);
-        tbvLibrosReserva.getSelectionModel().clearSelection();
-        tbvUsuarioReserva.getSelectionModel().clearSelection();
-    }
-    
     
     public void reservarLibroConConfirmacion(Libro libroSeleccionado) {
         if (libroSeleccionado == null) {
@@ -1188,7 +1177,7 @@ public class ControladorMain implements Initializable{
 
                 String insertReservaSQL = "INSERT INTO reserva "
                                        + "(idUsuario, idLibro, fechaReserva, fechaExpiracion, estado) "
-                                       + "VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 MONTH), 'ACTIVO')";
+                                       + "VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 MONTH), 'ACTIVO')";
                 String updateLibroSQL = "UPDATE libro "
                                       + "SET copiasDisponibles = copiasDisponibles - 1 "
                                       + "WHERE idLibro = ? AND copiasDisponibles > 0";
@@ -1214,7 +1203,7 @@ public class ControladorMain implements Initializable{
 
                     conexion.commit();
 
-                    LocalDate expira = LocalDate.now().plusMonths(2);
+                    LocalDate expira = LocalDate.now().plusMonths(1);
                     Alert exito = new Alert(Alert.AlertType.INFORMATION);
                     exito.setTitle("Reserva exitosa");
                     exito.setHeaderText(null);
@@ -1222,14 +1211,24 @@ public class ControladorMain implements Initializable{
                                          + libroSeleccionado.getTitulo() 
                                          + "\nLa reserva expirará el: " 
                                          + expira.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                                         + "\n(Duración: 2 meses)");
+                                         + "\n(Duración: 1 mes)");
                     exito.showAndWait();
-                    tbvLibros.setItems(listaLibrosDisponibles());
 
-                } 
+                    // Refrescar tabla
+                    if (opcDisponibles.isSelected()) {
+                        tbvLibros.setItems(listaLibrosDisponibles());
+                    } else if (opcReservas.isSelected()) {
+                        tbvLibros.setItems(listaLibrosReservados());
+                    } else {
+                        tbvLibros.setItems(listaTodosLibros());
+                    }
+                    tbvLibrosReserva.setItems(listaLibrosDisponibles());
+                    tbvLibros.getSelectionModel().clearSelection();
+                    tbvLibros.refresh();
+                }
 
             } catch (SQLException e) {
-                try { conexion.rollback(); } catch (SQLException ex) { /*…*/ }
+                try { conexion.rollback(); } catch (SQLException ex) { /* Ignorar */ }
                 Alert error = new Alert(Alert.AlertType.ERROR);
                 error.setTitle("Error");
                 error.setHeaderText("Fallo en la reserva.");
@@ -1237,10 +1236,11 @@ public class ControladorMain implements Initializable{
                 error.showAndWait();
 
             } finally {
-                try { conexion.setAutoCommit(true); } catch (SQLException e) { /*…*/ }
+                try { conexion.setAutoCommit(true); } catch (SQLException e) { /* Ignorar */ }
             }
         }
     }
+
 
     private void cancelarReservaDeLibroSeleccionado() {
         if (libroSeleccionado == null) return;
@@ -1291,6 +1291,7 @@ public class ControladorMain implements Initializable{
                 } else {
                     tbvLibros.setItems(listaTodosLibros());
                 }
+                tbvLibrosReserva.setItems(listaLibrosDisponibles());
 
                 btnReservarLibros.setDisable(true);
             }
@@ -1302,6 +1303,87 @@ public class ControladorMain implements Initializable{
             try { conexion.setAutoCommit(true); } catch (SQLException __) { }
         }
     }
+    
+    
+    //BOTONES RESERVA ADMINISTRADOR
+    @FXML
+    void btnAccionReservarAdmin(ActionEvent event) {
+        reservarLibroAUsuarioPorAdministrador(libroSeleccionadoReserva);
+        tbvLibrosReserva.getSelectionModel().clearSelection();
+        tbvUsuarioReserva.getSelectionModel().clearSelection();
+    }
+    
+    
+    @FXML
+    void btnCancelarAccionReservaAdmin(ActionEvent event) {
+        cancelarReservaDeUsuarioPorAdministrador();
+        tbvLibrosReserva.getSelectionModel().clearSelection();
+        tbvUsuarioReserva.getSelectionModel().clearSelection();
+    }
+    
+    public void cancelarReservaDeUsuarioPorAdministrador() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Anular reserva");
+        confirm.setHeaderText("¿Seguro que deseas anular la reserva del libro para el usuario seleccionado?");
+        confirm.setContentText("Libro: " + libroSeleccionadoReserva.getTitulo() + 
+                               "\nUsuario: " + usuarioSeleccionadoReserva.getNombreUsuario());
+
+        Optional<ButtonType> opt = confirm.showAndWait();
+        if (opt.isEmpty() || opt.get() != ButtonType.OK) return;
+
+        String sqlAnular = "UPDATE reserva SET estado = 'INACTIVO' "
+                         + "WHERE idUsuario = ? AND idLibro = ? AND estado = 'ACTIVO'";
+
+        String sqlDevolver = "UPDATE libro SET copiasDisponibles = copiasDisponibles + 1 "
+                           + "WHERE idLibro = ?";
+
+        try {
+            conexion.setAutoCommit(false);
+
+            try (PreparedStatement ps1 = conexion.prepareStatement(sqlAnular);
+                 PreparedStatement ps2 = conexion.prepareStatement(sqlDevolver)) {
+
+                ps1.setInt(1, usuarioSeleccionadoReserva.getIdUsuario());
+                ps1.setInt(2, libroSeleccionadoReserva.getIdLibro());
+                int mod1 = ps1.executeUpdate();
+
+                ps2.setInt(1, libroSeleccionadoReserva.getIdLibro());
+                int mod2 = ps2.executeUpdate();
+
+                if (mod1 == 0 || mod2 == 0) {
+                    conexion.rollback();
+                    new Alert(Alert.AlertType.ERROR, 
+                        "No se pudo anular la reserva correctamente.").showAndWait();
+                    return;
+                }
+
+                conexion.commit();
+                new Alert(Alert.AlertType.INFORMATION, 
+                    "Reserva anulada y copia devuelta al inventario.").showAndWait();
+
+                if (opcDisponibles.isSelected()) {
+                    tbvLibros.setItems(listaLibrosDisponibles());
+                } else if (opcReservas.isSelected()) {
+                    tbvLibros.setItems(listaLibrosReservados());
+                } else {
+                    tbvLibros.setItems(listaTodosLibros());
+                }
+                tbvLibrosReserva.setItems(listaLibrosDisponibles());
+                btnReservarAdmin.setDisable(true);
+                btnCancelarReservarAdmin.setDisable(true);
+
+            }
+
+        } catch (SQLException ex) {
+            try { conexion.rollback(); } catch (SQLException __) { }
+            new Alert(Alert.AlertType.ERROR, 
+                "Error al anular la reserva: " + ex.getMessage()).showAndWait();
+        } finally {
+            try { conexion.setAutoCommit(true); } catch (SQLException __) { }
+        }
+    }
+
+    
 
     public void reservarLibroAUsuarioPorAdministrador(Libro libroSeleccionado) {
         if (libroSeleccionado == null) {
@@ -1353,7 +1435,7 @@ public class ControladorMain implements Initializable{
 
                 String insertReservaSQL = "INSERT INTO reserva "
                                        + "(idUsuario, idLibro, fechaReserva, fechaExpiracion, estado) "
-                                       + "VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 MONTH), 'ACTIVO')";
+                                       + "VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 MONTH), 'ACTIVO')";
                 String updateLibroSQL = "UPDATE libro "
                                       + "SET copiasDisponibles = copiasDisponibles - 1 "
                                       + "WHERE idLibro = ? AND copiasDisponibles > 0";
@@ -1379,7 +1461,7 @@ public class ControladorMain implements Initializable{
 
                     conexion.commit();
 
-                    LocalDate expira = LocalDate.now().plusMonths(2);
+                    LocalDate expira = LocalDate.now().plusMonths(1);
                     Alert exito = new Alert(Alert.AlertType.INFORMATION);
                     exito.setTitle("Reserva exitosa");
                     exito.setHeaderText(null);
@@ -1387,7 +1469,7 @@ public class ControladorMain implements Initializable{
                                          + libroSeleccionado.getTitulo() 
                                          + "\nLa reserva expirará el: " 
                                          + expira.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                                         + "\n(Duración: 2 meses)");
+                                         + "\n(Duración: 1 meses)");
                     exito.showAndWait();
 
                     tbvLibros.setItems(listaLibrosDisponibles());
@@ -1487,7 +1569,7 @@ public class ControladorMain implements Initializable{
     }
 
     
-    private ObservableList<Libro> listaLibrosDisponibles() {
+    public ObservableList<Libro> listaLibrosDisponibles() {
         ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
 
         String query = "SELECT * FROM libro WHERE copiasDisponibles > 0";
@@ -1517,7 +1599,7 @@ public class ControladorMain implements Initializable{
     }
 
     
-    private ObservableList<Libro> listaLibrosReservados() {
+    public ObservableList<Libro> listaLibrosReservados() {
         ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
 
         String query = "SELECT DISTINCT l.* FROM libro l " +
@@ -1580,7 +1662,7 @@ public class ControladorMain implements Initializable{
     public ObservableList<Usuario> listaTodosUsuarios() {
         ObservableList<Usuario> lista = FXCollections.observableArrayList();
         String query = "SELECT idUsuario, nombreUsuario, apellidoUsuario, imagenUsuario, "
-                     + "email, `contraseña`,`cofirmacionContraseña`, telefono, direccion, rol "
+                     + "email, `contraseña`, telefono, direccion, rol "
                      + "FROM usuario";
 
         try (PreparedStatement pst = conexion.prepareStatement(query);
@@ -1596,7 +1678,6 @@ public class ControladorMain implements Initializable{
                     rs.getString("apellidoUsuario"),
                     rs.getString("imagenUsuario"),
                     rs.getString("email"),
-                    rs.getString("cofirmacionContraseña"),
                     rs.getString("contraseña"),
                     rs.getString("telefono"),
                     rs.getString("direccion"),
@@ -1618,8 +1699,8 @@ public class ControladorMain implements Initializable{
         txtNombreUsuario.setText(usuarioLog.getNombreUsuario());
         txtEmailUsuario.setText(usuarioLog.getEmail());
         imgUsuario.setImage(base64ToImage(usuarioLog.getImagenUsuario()));
-        imgUsuario.setFitWidth(100);
-        imgUsuario.setFitHeight(100);
+        imgUsuario.setFitWidth(50);
+        imgUsuario.setFitHeight(50);
         imgUsuario.setPreserveRatio(true);
         
         if (usuarioLog.getRol() != RolUsuario.ADMINISTRADOR) {
@@ -1651,7 +1732,7 @@ public class ControladorMain implements Initializable{
         String sql = 
             "DELETE FROM reserva " +
             "WHERE estado = 'INACTIVO' " +
-            "  AND fechaExpiracion < DATE_SUB(CURDATE(), INTERVAL 2 MONTH)";
+            "  AND fechaExpiracion < DATE_SUB(CURDATE(), INTERVAL 1 MONTH)";
         try (Statement st = conexion.createStatement()) {
             int filasBorradas = st.executeUpdate(sql);
             System.out.println("Reservas muy antiguas eliminadas: " + filasBorradas);

@@ -369,6 +369,8 @@ public class ControladorLibro implements Initializable{
         }
 
         cMain.tbvLibros.setItems(cMain.listaTodosLibros());
+        
+        cMain.tbvLibrosReserva.setItems(cMain.listaLibrosDisponibles());
     }
     
     public boolean existeLibroConTitulo(String titulo) {
@@ -446,108 +448,26 @@ public class ControladorLibro implements Initializable{
         alert.showAndWait();
     }
     
-    /*private void editarLibro() throws SQLException {
-        try {
-            // Validar que hay un libro seleccionado
-            if (libroSeleccionado == null) {
-                mostrarAlertaError("Error", "No hay ningún libro seleccionado");
-                return;
-            }
-
-            // Validar campos numéricos
-            int totalCopias = Integer.parseInt(txtTotalCopias.getText());
-            int idCategoria = obtenerIdCategoriaPorNombre(txtCategoriaElegida.getText());
-            int idEditorial = obtenerIdEditorialPorNombre(txtEditorialElegida.getText());
-
-            
-            // Obtener copias ya reservadas
-            int copiasReservadas = obtenerCopiasReservadas(libroSeleccionado.getIdLibro());
-
-            // Validar que no se reduzca por debajo de las copias reservadas
-            if (totalCopias < copiasReservadas) {
-                mostrarAlertaError("Error de validación",
-                    "No se puede establecer un número de copias menor a las ya reservadas (" + copiasReservadas + ").");
-                return;
-            }
-            
-            // Actualizar el objeto libro
-            libroSeleccionado.setTitulo(txtTitulo.getText().trim());
-            libroSeleccionado.setDescripcion(txtDescripcion.getText().trim());
-            libroSeleccionado.setISBN(txtISBN.getText().trim());
-            libroSeleccionado.setTotalCopias(totalCopias);
-            libroSeleccionado.setIdCategoria(idCategoria);
-            libroSeleccionado.setIdEditorial(idEditorial);
-
-            // Query de actualización
-            String query = "UPDATE libro SET "
-                    + "titulo = ?, "
-                    + "descripcion = ?, "
-                    + "ISBN = ?, "
-                    + "totalCopias = ?, "
-                    + "idCategoria = ?, "
-                    + "idEditorial = ? "
-                    + "WHERE idLibro = ?";
-
-            try (PreparedStatement pst = conexion.prepareStatement(query)) {
-
-                // Setear parámetros
-                pst.setString(1, libroSeleccionado.getTitulo());
-                pst.setString(2, libroSeleccionado.getDescripcion());
-                pst.setString(3, libroSeleccionado.getISBN());
-                pst.setInt(4, libroSeleccionado.getTotalCopias());
-                pst.setInt(5, libroSeleccionado.getIdCategoria());
-                pst.setInt(6, libroSeleccionado.getIdEditorial());
-                pst.setInt(7, libroSeleccionado.getIdLibro());
-
-                int filasAfectadas = pst.executeUpdate();
-
-                if (filasAfectadas > 0) {
-                    mostrarAlertaExito("Éxito", "Libro actualizado correctamente");
-
-                    // Cerrar ventana de edición
-                    Stage stage = (Stage) btnAceptar.getScene().getWindow();
-                    stage.close();
-
-                    // Actualizar tabla principal
-                    cMain.tbvLibros.setItems(cMain.listaTodosLibros());
-                } else {
-                    mostrarAlertaError("Error", "No se pudo actualizar el libro");
-                }
-
-            } catch (SQLException e) {
-                mostrarAlertaError("Error de base de datos", e.getMessage());
-            }
-
-        } catch (NumberFormatException e) {
-            mostrarAlertaError("Error numérico", "Verifique los campos numéricos");
-        }
-    }*/
-    
     private void editarLibro() throws SQLException {
         try {
-            // Validar que hay un libro seleccionado
             if (libroSeleccionado == null) {
                 mostrarAlertaError("Error", "No hay ningún libro seleccionado");
                 return;
             }
 
-            // Validar campos numéricos
             int totalCopias = Integer.parseInt(txtTotalCopias.getText().trim());
             int idCategoria = obtenerIdCategoriaPorNombre(txtCategoriaElegida.getText().trim());
             int idEditorial = obtenerIdEditorialPorNombre(txtEditorialElegida.getText().trim());
             int idAutorNuevo = obtenerIdAutorPorNombreCompleto(txtAutorElegido.getText().trim());
 
-            // Obtener copias ya reservadas
             int copiasReservadas = obtenerCopiasReservadas(libroSeleccionado.getIdLibro());
 
-            // Validar que no se reduzca por debajo de las copias reservadas
             if (totalCopias < copiasReservadas) {
                 mostrarAlertaError("Error de validación",
                     "No se puede establecer un número de copias menor a las ya reservadas (" + copiasReservadas + ").");
                 return;
             }
 
-            // Actualizar el objeto libro
             libroSeleccionado.setTitulo(txtTitulo.getText().trim());
             libroSeleccionado.setDescripcion(txtDescripcion.getText().trim());
             libroSeleccionado.setISBN(txtISBN.getText().trim());
@@ -577,8 +497,6 @@ public class ControladorLibro implements Initializable{
                 int filasAfectadasLibro = pstLibro.executeUpdate();
 
                 if (filasAfectadasLibro > 0) {
-                    // Actualizar relación libro_Autor solo si el autor cambió
-                    // Primero obtenemos el idAutor actual asociado
                     int idAutorActual = obtenerIdAutorPorIdLibro(libroSeleccionado.getIdLibro());
 
                     if (idAutorActual != idAutorNuevo) {
@@ -594,12 +512,11 @@ public class ControladorLibro implements Initializable{
 
                     mostrarAlertaExito("Éxito", "Libro actualizado correctamente");
 
-                    // Cerrar ventana de edición
                     Stage stage = (Stage) btnAceptar.getScene().getWindow();
                     stage.close();
 
-                    // Actualizar tabla principal
                     cMain.tbvLibros.setItems(cMain.listaTodosLibros());
+                    cMain.tbvLibrosReserva.setItems(cMain.listaLibrosDisponibles());
                 } else {
                     mostrarAlertaError("Error", "No se pudo actualizar el libro");
                 }

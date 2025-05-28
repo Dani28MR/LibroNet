@@ -165,7 +165,6 @@ public class ControladorLogin implements Initializable{
                             rs.getString("imagenUsuario"), 
                             rs.getString("email"),
                             rs.getString("contraseña"),
-                            rs.getString("cofirmacionContraseña"),
                             rs.getString("telefono"),
                             rs.getString("direccion"),
                             RolUsuario.valueOf(rs.getString("rol")));
@@ -201,7 +200,6 @@ public class ControladorLogin implements Initializable{
                         rs.getString("imagenUsuario"), 
                         rs.getString("email"),
                         rs.getString("contraseña"),
-                        rs.getString("cofirmacionContraseña"),
                         rs.getString("telefono"),
                         rs.getString("direccion"),
                         RolUsuario.valueOf(rs.getString("rol")));

@@ -226,7 +226,16 @@
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
                                     </TableView>
-                                    <Button fx:id="btnReservarAdmin" disable="true" minHeight="40.0" minWidth="500.0" onAction="#btnAccionReservarAdmin" text="_Realizar reserva" />
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Button fx:id="btnReservarAdmin" disable="true" minHeight="40.0" minWidth="450.0" onAction="#btnAccionReservarAdmin" text="_Realizar reserva" />
+                                          <Button fx:id="btnCancelarReservarAdmin" disable="true" minHeight="40.0" minWidth="450.0" onAction="#btnCancelarAccionReservaAdmin" text="_Cancelar reserva">
+                                             <HBox.margin>
+                                                <Insets left="20.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                       </children>
+                                    </HBox>
                                  </children>
                           </VBox>
                         </content>

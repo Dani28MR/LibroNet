@@ -133,8 +133,8 @@ public class ControladorUsuario implements Initializable{
             
                 Image image = new Image(rutaImg.toURI().toString());
                 imgUsuario.setImage(image);
-                imgUsuario.setFitWidth(200);
-                imgUsuario.setFitHeight(150);
+                imgUsuario.setFitWidth(150);
+                imgUsuario.setFitHeight(100);
                 imgUsuario.setPreserveRatio(true);
             } catch (Exception e) {
                 mostrarAlertaError("Error de carga", "Por favor, seleccione un archivo de imagen válido (PNG, JPG, JPEG, GIF).");
@@ -177,7 +177,7 @@ public class ControladorUsuario implements Initializable{
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
             String queryInsert = "INSERT INTO usuario (nombreUsuario, apellidoUsuario, imagenUsuario, "
-                               + "email, contraseña, cofirmacionContraseña, telefono, direccion, rol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                               + "email, contraseña,  telefono, direccion, rol) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement pstIns = conexion.prepareStatement(queryInsert)) {
                 pstIns.setString(1, nombre);
@@ -185,10 +185,9 @@ public class ControladorUsuario implements Initializable{
                 pstIns.setString(3, convertirImagenA64(rutaImg));
                 pstIns.setString(4, email);
                 pstIns.setString(5, hashedPassword);
-                pstIns.setString(6, hashedPassword);
-                pstIns.setString(7, telefono);
-                pstIns.setString(8, direccion);
-                pstIns.setString(9, RolUsuario.LECTOR.name());
+                pstIns.setString(6, telefono);
+                pstIns.setString(7, direccion);
+                pstIns.setString(8, RolUsuario.LECTOR.name());
 
                 int filas = pstIns.executeUpdate();
                 if (filas > 0) {
@@ -204,6 +203,8 @@ public class ControladorUsuario implements Initializable{
         
         if (!crearUs) {
             cMain.tbvUsuarios.setItems(cMain.listaTodosUsuarios());
+            
+            cMain.tbvUsuarioReserva.setItems(cMain.listaTodosUsuarios());
         }
     }
     
@@ -273,7 +274,6 @@ public class ControladorUsuario implements Initializable{
                     + "imagenUsuario = ?, "
                     + "email = ?, "
                     + "contraseña = ?, "
-                    + "cofirmacionContraseña = ?, "
                     + "telefono = ?, "
                     + "direccion = ?, "
                     + "rol = ? "
@@ -285,16 +285,16 @@ public class ControladorUsuario implements Initializable{
                 pst.setString(3, imagen);
                 pst.setString(4, email);
                 pst.setString(5, hashedPassword);
-                pst.setString(6, hashedPassword);
-                pst.setString(7, telefono.isEmpty() ? null : telefono);
-                pst.setString(8, direccion.isEmpty() ? null : direccion);
-                pst.setString(9, rol);
-                pst.setInt(10, idUsuario);
+                pst.setString(6, telefono.isEmpty() ? null : telefono);
+                pst.setString(7, direccion.isEmpty() ? null : direccion);
+                pst.setString(8, rol);
+                pst.setInt(9, idUsuario);
 
                 int filasAfectadas = pst.executeUpdate();
                 if (filasAfectadas > 0) {
                     mostrarAlertaExito("Éxito", "Usuario actualizado correctamente");
                     cMain.tbvUsuarios.setItems(cMain.listaTodosUsuarios());
+                    cMain.tbvUsuarioReserva.setItems(cMain.listaTodosUsuarios());
                 } else {
                     mostrarAlertaError("Error", "No se pudo actualizar el usuario");
                 }
@@ -433,13 +433,13 @@ public class ControladorUsuario implements Initializable{
         txtTelefono.setText(usuarioSeleccionado.getTelefono());
         txtDireccion.setText(usuarioSeleccionado.getDireccion());
         txtPassword.setText(usuarioSeleccionado.getContraseña());
-        txtPasswordConfirmacion.setText(usuarioSeleccionado.getCofirmacionContraseña());
+        txtPasswordConfirmacion.setText(usuarioSeleccionado.getContraseña());
         
         String imagenBase64 = usuarioSeleccionado.getImagenUsuario();
         if (imagenBase64 != null) {
             imgUsuario.setImage(cMain.base64ToImage(imagenBase64));
-            imgUsuario.setFitWidth(200);
-            imgUsuario.setFitHeight(150);
+            imgUsuario.setFitWidth(150);
+            imgUsuario.setFitHeight(100);
             imgUsuario.setPreserveRatio(true);
         }
     }
