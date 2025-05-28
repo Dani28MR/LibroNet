@@ -62,13 +62,13 @@ import modelo.Usuario;
 public class ControladorMain implements Initializable{
 
     @FXML
-    private Button btnAddAutores;
+    public Button btnAddAutores;
 
     @FXML
-    private Button btnAddCategorias;
+    public Button btnAddCategorias;
 
     @FXML
-    private Button btnAddEditoriales;
+    public Button btnAddEditoriales;
 
     @FXML
     public Button btnAddLibros;
@@ -77,13 +77,13 @@ public class ControladorMain implements Initializable{
     private Button btnAddUsuarios;
 
     @FXML
-    private Button btnBorrarAutores;
+    public Button btnBorrarAutores;
 
     @FXML
-    private Button btnBorrarCategorias;
+    public Button btnBorrarCategorias;
 
     @FXML
-    private Button btnBorrarEditoriales;
+    public Button btnBorrarEditoriales;
 
     @FXML
     public Button btnBorrarLibros;
@@ -92,10 +92,10 @@ public class ControladorMain implements Initializable{
     public Button btnBorrarUsuarios;
 
     @FXML
-    private Button btnEditarAutores;
+    public Button btnEditarAutores;
 
     @FXML
-    private Button btnEditarEditoriales;
+    public Button btnEditarEditoriales;
 
     @FXML
     public Button btnEditarLibros;
@@ -113,13 +113,13 @@ public class ControladorMain implements Initializable{
     private Button btnCancelarReserva;
 
     @FXML
-    private Button btnVerAutores;
+    public Button btnVerAutores;
 
     @FXML
-    private Button btnVerCategorias;
+    public Button btnVerCategorias;
 
     @FXML
-    private Button btnVerEditoriales;
+    public Button btnVerEditoriales;
 
     @FXML
     public Button btnVerLibros;
@@ -777,6 +777,12 @@ public class ControladorMain implements Initializable{
                         mostrarAlertaExito("Éxito", "Autor eliminado correctamente");
                         // Actualizar la tabla de autores
                         tbvAutores.setItems(listaTodosAutores());
+                        
+                        tbvAutores.getSelectionModel().clearSelection();
+                        tbvAutores.getFocusModel().focus(null);
+                        btnBorrarAutores.setDisable(true);
+                        btnEditarAutores.setDisable(true);
+                        btnVerAutores.setDisable(true);
                         
                     } else {
                         mostrarAlertaError("Error", "No se pudo eliminar el autor");

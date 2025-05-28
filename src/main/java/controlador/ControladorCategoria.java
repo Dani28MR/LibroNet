@@ -132,6 +132,10 @@ public class ControladorCategoria implements Initializable{
         }
 
         cMain.tbvCategorias.setItems(cMain.listaTodasCategorias());
+        cMain.tbvCategorias.getSelectionModel().clearSelection();
+        cMain.tbvCategorias.getFocusModel().focus(null);
+        cMain.btnBorrarCategorias.setDisable(true);
+        cMain.btnVerCategorias.setDisable(true);
     }
 
     

@@ -185,6 +185,11 @@ public class ControladorEditorial implements Initializable {
         }
 
         cMain.tbvEditoriales.setItems(cMain.listaTodasEditoriales());
+        cMain.tbvEditoriales.getSelectionModel().clearSelection();
+        cMain.tbvEditoriales.getFocusModel().focus(null);
+        cMain.btnBorrarEditoriales.setDisable(true);
+        cMain.btnEditarEditoriales.setDisable(true);
+        cMain.btnVerEditoriales.setDisable(true);
     }
     
     private void editarEditorial() {
@@ -224,6 +229,11 @@ public class ControladorEditorial implements Initializable {
         }
 
         cMain.tbvEditoriales.setItems(cMain.listaTodasEditoriales());
+        cMain.tbvEditoriales.getSelectionModel().clearSelection();
+        cMain.tbvEditoriales.getFocusModel().focus(null);
+        cMain.btnBorrarEditoriales.setDisable(true);
+        cMain.btnEditarEditoriales.setDisable(true);
+        cMain.btnVerEditoriales.setDisable(true);
     }
 
 

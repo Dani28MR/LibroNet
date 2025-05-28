@@ -367,10 +367,14 @@ public class ControladorUsuario implements Initializable{
 
         validationSupport.registerValidator(txtPasswordConfirmacion, true, (Control c, String value) -> {
             String password = txtPassword.getText();
-            boolean isValid = value != null && value.equals(password);
-            ValidationMessage message = isValid
-                ? null
-                : ValidationMessage.error(c, "Las contraseñas no coinciden y debe tener al menos 6 caracteres y una mayúscula (ej: Abcd1234)");
+            ValidationMessage message = null;
+
+            if (value == null || value.trim().isEmpty()) {
+                message = ValidationMessage.error(c, "La confirmación de la contraseña es obligatoria y debe tener al menos 6 caracteres y una mayúscula (ej: Abcd1234)");
+            } else if (!value.equals(password)) {
+                message = ValidationMessage.error(c, "Las contraseñas no coinciden");
+            }
+
             return ValidationResult.fromMessages(message);
         });
 

@@ -160,6 +160,12 @@ public class ControladorAutor implements Initializable{
                     stage.close();
                     // Actualizar la tabla de autores
                     cMain.tbvAutores.setItems(cMain.listaTodosAutores());
+                    cMain.tbvAutores.getSelectionModel().clearSelection();
+                    cMain.tbvAutores.getFocusModel().focus(null);
+                    cMain.btnBorrarAutores.setDisable(true);
+                    cMain.btnEditarAutores.setDisable(true);
+                    cMain.btnVerAutores.setDisable(true);
+                    
                 } else {
                     cMain.mostrarAlertaError("Error", "No se pudo crear el autor");
                 }
@@ -229,6 +235,11 @@ public class ControladorAutor implements Initializable{
                     cMain.tbvAutores.setItems(cMain.listaTodosAutores());
                     Stage stage = (Stage) txtNombre.getScene().getWindow();
                     stage.close();
+                    cMain.tbvAutores.getSelectionModel().clearSelection();
+                    cMain.tbvAutores.getFocusModel().focus(null);
+                    cMain.btnBorrarAutores.setDisable(true);
+                    cMain.btnEditarAutores.setDisable(true);
+                    cMain.btnVerAutores.setDisable(true);
                 } else {
                     cMain.mostrarAlertaError("Error", "No se pudo actualizar el autor");
                 }
