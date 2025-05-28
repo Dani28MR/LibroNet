@@ -371,6 +371,12 @@ public class ControladorLibro implements Initializable{
         cMain.tbvLibros.setItems(cMain.listaTodosLibros());
         
         cMain.tbvLibrosReserva.setItems(cMain.listaLibrosDisponibles());
+        
+        cMain.tbvLibros.getSelectionModel().clearSelection();
+        cMain.tbvLibros.getFocusModel().focus(null);
+        cMain.btnBorrarLibros.setDisable(true);
+        cMain.btnEditarLibros.setDisable(true);
+        cMain.btnVerLibros.setDisable(true);
     }
     
     public boolean existeLibroConTitulo(String titulo) {
@@ -517,6 +523,12 @@ public class ControladorLibro implements Initializable{
 
                     cMain.tbvLibros.setItems(cMain.listaTodosLibros());
                     cMain.tbvLibrosReserva.setItems(cMain.listaLibrosDisponibles());
+                    
+                    cMain.tbvLibros.getSelectionModel().clearSelection();
+                    cMain.tbvLibros.getFocusModel().focus(null);
+                    cMain.btnBorrarLibros.setDisable(true);
+                    cMain.btnEditarLibros.setDisable(true);
+                    cMain.btnVerLibros.setDisable(true);
                 } else {
                     mostrarAlertaError("Error", "No se pudo actualizar el libro");
                 }

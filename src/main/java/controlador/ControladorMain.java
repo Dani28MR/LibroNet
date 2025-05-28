@@ -71,7 +71,7 @@ public class ControladorMain implements Initializable{
     private Button btnAddEditoriales;
 
     @FXML
-    private Button btnAddLibros;
+    public Button btnAddLibros;
 
     @FXML
     private Button btnAddUsuarios;
@@ -86,10 +86,10 @@ public class ControladorMain implements Initializable{
     private Button btnBorrarEditoriales;
 
     @FXML
-    private Button btnBorrarLibros;
+    public Button btnBorrarLibros;
 
     @FXML
-    private Button btnBorrarUsuarios;
+    public Button btnBorrarUsuarios;
 
     @FXML
     private Button btnEditarAutores;
@@ -98,10 +98,10 @@ public class ControladorMain implements Initializable{
     private Button btnEditarEditoriales;
 
     @FXML
-    private Button btnEditarLibros;
+    public Button btnEditarLibros;
 
     @FXML
-    private Button btnEditarUsuarios;
+    public Button btnEditarUsuarios;
 
     @FXML
     private Button btnReservarLibros;
@@ -122,10 +122,10 @@ public class ControladorMain implements Initializable{
     private Button btnVerEditoriales;
 
     @FXML
-    private Button btnVerLibros;
+    public Button btnVerLibros;
 
     @FXML
-    private Button btnVerUsuarios;
+    public Button btnVerUsuarios;
 
     @FXML
     private TableColumn<Autor, String> colApellidoAutores;
@@ -228,7 +228,7 @@ public class ControladorMain implements Initializable{
     private ImageView imgSalir;
 
     @FXML
-    private ImageView imgUsuario;
+    public ImageView imgUsuario;
 
     @FXML
     private ImageView imgVerAutor;
@@ -390,7 +390,7 @@ public class ControladorMain implements Initializable{
             tbvCategorias.setItems(listaTodasCategorias());
             tbvUsuarios.setItems(listaTodosUsuarios());
             
-            tbvLibrosReserva.setItems(listaLibrosDisponibles());
+            tbvLibrosReserva.setItems(listaTodosLibros());
             tbvUsuarioReserva.setItems(listaTodosUsuarios());
 
             tg.selectedToggleProperty().addListener((obs, oldT, newT) -> {
@@ -589,6 +589,7 @@ public class ControladorMain implements Initializable{
         stage.showAndWait();
     }
     
+    
     private void eliminarLibro() {
         try {
             if (libroSeleccionado == null) {
@@ -598,18 +599,31 @@ public class ControladorMain implements Initializable{
 
             int idLibro = libroSeleccionado.getIdLibro();
 
-            if (tieneReservas(idLibro)) {
-                mostrarAlertaError("No permitido", "Este libro no puede ser eliminado porque tiene reservas asociadas.");
-                
+            if (tieneReservasActivas(idLibro)) {
+                mostrarAlertaError("No permitido", "Este libro no puede ser eliminado porque tiene reservas ACTIVAS asociadas.");
                 return;
             }
-        
+
+            if (tieneReservasInactivas(idLibro)) {
+                Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+                alerta.setTitle("Reservas Inactivas Encontradas");
+                alerta.setHeaderText("Este libro tiene reservas INACTIVAS asociadas.");
+                alerta.setContentText("¿Deseas eliminar también estas reservas inactivas y luego el libro?");
+                Optional<ButtonType> respuesta = alerta.showAndWait();
+
+                if (!(respuesta.isPresent() && respuesta.get() == ButtonType.OK)) {
+                    return; // El usuario canceló
+                }
+
+                eliminarReservasInactivas(idLibro);
+            }
+
             Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el libro?");
             confirmacion.setContentText("Esta acción no se puede deshacer.");
-
             Optional<ButtonType> resultado = confirmacion.showAndWait();
+
             if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
                 String query = "DELETE FROM libro WHERE idLibro = ?";
                 try (PreparedStatement pst = conexion.prepareStatement(query)) {
@@ -619,16 +633,15 @@ public class ControladorMain implements Initializable{
                     if (filasAfectadas > 0) {
                         mostrarAlertaExito("Éxito", "Libro eliminado correctamente");
                         tbvLibros.setItems(listaTodosLibros());
-                        
+
                         tbvLibros.getSelectionModel().clearSelection();
                         tbvLibros.getFocusModel().focus(null);
                         btnBorrarLibros.setDisable(true);
                         btnEditarLibros.setDisable(true);
                         btnVerLibros.setDisable(true);
                         btnReservarLibros.setDisable(true);
-                        
+
                         tbvLibrosReserva.setItems(listaLibrosDisponibles());
-                        
                     } else {
                         mostrarAlertaError("Error", "No se pudo eliminar el libro");
                     }
@@ -639,32 +652,32 @@ public class ControladorMain implements Initializable{
             mostrarAlertaError("Error de base de datos", e.getMessage());
         }
     }
-
-    
-    private boolean tieneReservas(int idLibro) throws SQLException {
-        String query = "SELECT COUNT(*) AS total FROM reserva WHERE idLibro = ?";
+    private boolean tieneReservasActivas(int idLibro) throws SQLException {
+        String query = "SELECT COUNT(*) AS total FROM reserva WHERE idLibro = ? AND estado = 'ACTIVO'";
         try (PreparedStatement pst = conexion.prepareStatement(query)) {
             pst.setInt(1, idLibro);
             try (ResultSet rs = pst.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total") > 0;
-                }
+                return rs.next() && rs.getInt("total") > 0;
             }
         }
-        return false;
     }
 
-    private boolean tieneAutoresRelacionados(int idLibro) throws SQLException {
-        String query = "SELECT COUNT(*) AS total FROM libro_Autor WHERE idLibro = ?";
+    private boolean tieneReservasInactivas(int idLibro) throws SQLException {
+        String query = "SELECT COUNT(*) AS total FROM reserva WHERE idLibro = ? AND estado = 'INACTIVO'";
         try (PreparedStatement pst = conexion.prepareStatement(query)) {
             pst.setInt(1, idLibro);
             try (ResultSet rs = pst.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total") > 0;
-                }
+                return rs.next() && rs.getInt("total") > 0;
             }
         }
-        return false;
+    }
+
+    private void eliminarReservasInactivas(int idLibro) throws SQLException {
+        String query = "DELETE FROM reserva WHERE idLibro = ? AND estado = 'INACTIVO'";
+        try (PreparedStatement pst = conexion.prepareStatement(query)) {
+            pst.setInt(1, idLibro);
+            pst.executeUpdate();
+        }
     }
 
     
@@ -1222,7 +1235,7 @@ public class ControladorMain implements Initializable{
                     } else {
                         tbvLibros.setItems(listaTodosLibros());
                     }
-                    tbvLibrosReserva.setItems(listaLibrosDisponibles());
+                    tbvLibrosReserva.setItems(listaTodosLibros());
                     tbvLibros.getSelectionModel().clearSelection();
                     tbvLibros.refresh();
                 }
@@ -1291,7 +1304,7 @@ public class ControladorMain implements Initializable{
                 } else {
                     tbvLibros.setItems(listaTodosLibros());
                 }
-                tbvLibrosReserva.setItems(listaLibrosDisponibles());
+                tbvLibrosReserva.setItems(listaTodosLibros());
 
                 btnReservarLibros.setDisable(true);
             }
@@ -1368,7 +1381,7 @@ public class ControladorMain implements Initializable{
                 } else {
                     tbvLibros.setItems(listaTodosLibros());
                 }
-                tbvLibrosReserva.setItems(listaLibrosDisponibles());
+                tbvLibrosReserva.setItems(listaTodosLibros());
                 btnReservarAdmin.setDisable(true);
                 btnCancelarReservarAdmin.setDisable(true);
 
@@ -1471,7 +1484,15 @@ public class ControladorMain implements Initializable{
                                          + expira.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                                          + "\n(Duración: 1 meses)");
                     exito.showAndWait();
-
+                    
+                    if (opcDisponibles.isSelected()) {
+                        tbvLibros.setItems(listaLibrosDisponibles());
+                    } else if (opcReservas.isSelected()) {
+                        tbvLibros.setItems(listaLibrosReservados());
+                    } else {
+                        tbvLibros.setItems(listaTodosLibros());
+                    }
+                    
                     tbvLibros.setItems(listaLibrosDisponibles());
 
                 } 

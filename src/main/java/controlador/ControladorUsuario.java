@@ -203,8 +203,13 @@ public class ControladorUsuario implements Initializable{
         
         if (!crearUs) {
             cMain.tbvUsuarios.setItems(cMain.listaTodosUsuarios());
-            
             cMain.tbvUsuarioReserva.setItems(cMain.listaTodosUsuarios());
+            
+            cMain.tbvUsuarios.getSelectionModel().clearSelection();
+            cMain.tbvUsuarios.getFocusModel().focus(null);
+            cMain.btnBorrarUsuarios.setDisable(true);
+            cMain.btnEditarUsuarios.setDisable(true);
+            cMain.btnVerUsuarios.setDisable(true);
         }
     }
     
@@ -264,6 +269,7 @@ public class ControladorUsuario implements Initializable{
 
             if (rutaImg != null) {
                 imagen = cMain.convertirImagenA64(rutaImg);
+                cMain.imgUsuario.setImage(cMain.base64ToImage(imagen));
             } else {
                 imagen = usuarioSeleccionado.getImagenUsuario();
             }
@@ -295,6 +301,12 @@ public class ControladorUsuario implements Initializable{
                     mostrarAlertaExito("Éxito", "Usuario actualizado correctamente");
                     cMain.tbvUsuarios.setItems(cMain.listaTodosUsuarios());
                     cMain.tbvUsuarioReserva.setItems(cMain.listaTodosUsuarios());
+                    
+                    cMain.tbvUsuarios.getSelectionModel().clearSelection();
+                    cMain.tbvUsuarios.getFocusModel().focus(null);
+                    cMain.btnBorrarUsuarios.setDisable(true);
+                    cMain.btnEditarUsuarios.setDisable(true);
+                    cMain.btnVerUsuarios.setDisable(true);
                 } else {
                     mostrarAlertaError("Error", "No se pudo actualizar el usuario");
                 }
