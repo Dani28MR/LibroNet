@@ -8,46 +8,62 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="341.0" prefWidth="386.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorLogin">
+<VBox fx:id="mainContainer" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" 
+      minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="350.0" 
+      xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="controlador.ControladorLogin" style="-fx-background-color: #F0F1FF;">
    <children>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+      <HBox alignment="CENTER" prefHeight="120.0" prefWidth="350.0" 
+            style="-fx-background-color: #A9AAC7; -fx-background-radius: 20;">
          <children>
-            <ImageView fx:id="imgLogo" fitHeight="85.0" fitWidth="85.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="imgLogo" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+      
+      <Label text="" prefHeight="30"/>
+      
+      <HBox alignment="CENTER" prefHeight="70.0" prefWidth="350.0">
          <children>
-            <ImageView fx:id="imgUsuario" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" />
-            <TextField fx:id="txtUsuario">
+            <ImageView fx:id="imgUsuario" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+            <TextField fx:id="txtUsuario" style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-background-color: white; -fx-border-color: #A9AAC7; -fx-border-width: 1.5; -fx-padding: 10; -fx-font-size: 14; -fx-prompt-text-fill: #87879B;" prefWidth="250.0" promptText="Nombre de usuario">
                <HBox.margin>
                   <Insets left="15.0" />
-               </HBox.margin></TextField>
+               </HBox.margin>
+            </TextField>
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+      
+      <HBox alignment="CENTER" prefHeight="70.0" prefWidth="350.0">
          <children>
-            <ImageView fx:id="imgPassword" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" />
-            <PasswordField fx:id="txtPassword">
+            <ImageView fx:id="imgPassword" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+            <PasswordField fx:id="txtPassword" style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-background-color: white; -fx-border-color: #A9AAC7; -fx-border-width: 1.5; -fx-padding: 10; -fx-font-size: 14; -fx-prompt-text-fill: #87879B;" prefWidth="250.0" promptText="Contraseña">
                <HBox.margin>
                   <Insets left="15.0" />
                </HBox.margin>
             </PasswordField>
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+      
+      <HBox alignment="CENTER" prefHeight="80.0" prefWidth="350.0">
          <children>
-            <Button fx:id="btnEntrar" onAction="#btnAccionEntrar" text="_Entrar" />
+            <Button fx:id="btnEntrar" onAction="#btnAccionEntrar" text="_Entrar" style="-fx-background-color: #A9AAC7; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 20; -fx-padding: 10 40; -fx-cursor: hand;">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+      
+      <HBox alignment="CENTER" spacing="5" prefHeight="50.0" prefWidth="350.0">
          <children>
-            <Label mnemonicParsing="true" text="_¿No tienes cuenta aún?   " />
-            <Button fx:id="btnCrearCuenta" onAction="#btnAccionCrearCuenta" text="_Crear cuenta" />
+            <Label style="-fx-text-fill: #87879B;" text="¿No tienes cuenta aún?" />
+            <Button fx:id="btnCrearCuenta" onAction="#btnAccionCrearCuenta" style="-fx-background-color: transparent; -fx-text-fill: #7B7C99; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;" text="_Crear cuenta" />
          </children>
       </HBox>
    </children>
    <padding>
-      <Insets top="15.0" />
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
 </VBox>

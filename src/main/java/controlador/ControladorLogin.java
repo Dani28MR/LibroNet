@@ -17,7 +17,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -97,11 +99,13 @@ public class ControladorLogin implements Initializable{
         String password = txtPassword.getText().trim();
         
         if (!consultarUsuario(email)) {
-            System.out.println("Usuario no encontrado");
+            mostrarAlertaError("Error", "Este usuario no existe");
             return;
-        }else{
-            System.out.println("usuario encontrado y se llama: "+usuarioLogin.getNombreUsuario());
-            System.out.println(""+BCrypt.checkpw(password, usuarioLogin.getContraseña()));
+        }
+        
+        if (!BCrypt.checkpw(password, usuarioLogin.getContraseña())) {
+            mostrarAlertaError("Error", "Contraseña incorrecta");
+            return;
         }
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -240,4 +244,18 @@ public class ControladorLogin implements Initializable{
         }
     }
     
+    
+    void mostrarAlertaError(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+        dialogPane.getStyleClass().add("error");
+            
+        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
 }

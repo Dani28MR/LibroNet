@@ -1,0 +1,370 @@
+
+/* Estilo general para errores */
+.dialog-pane.error {
+    -fx-background-color: #ffe6e6;
+    -fx-border-color: #f44336;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.error .content {
+    -fx-text-fill: #b71c1c;
+}
+
+.dialog-pane.error .header-panel .label {
+    -fx-text-fill: #d32f2f;
+}
+
+.dialog-pane.error .button {
+    -fx-background-color: linear-gradient(to bottom, #f44336, #d32f2f);
+    -fx-text-fill: white;
+}
+
+.dialog-pane.error .button:hover {
+    -fx-background-color: linear-gradient(to bottom, #e53935, #c62828);
+}
+
+.dialog-pane.error .button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #d32f2f, #b71c1c);
+}
+
+/* Estilo específico para alerta de reserva duplicada */
+.dialog-pane.reserva-duplicada {
+    -fx-background-color: #fff3e0;
+    -fx-border-color: #ff9800;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.reserva-duplicada .content {
+    -fx-text-fill: #e65100;
+}
+
+.dialog-pane.reserva-duplicada .header-panel .label {
+    -fx-text-fill: #ef6c00;
+}
+
+.dialog-pane.reserva-duplicada .button {
+    -fx-background-color: linear-gradient(to bottom, #ff9800, #f57c00);
+    -fx-text-fill: #5d4037;
+}
+
+.dialog-pane.reserva-duplicada .button:hover {
+    -fx-background-color: linear-gradient(to bottom, #ffa000, #fb8c00);
+}
+
+.dialog-pane.reserva-duplicada .button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #f57c00, #e65100);
+}
+
+/* Estilo para alertas de información */
+.dialog-pane.informacion {
+    -fx-background-color: #e3f2fd;
+    -fx-border-color: #2196F3;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.informacion .content {
+    -fx-text-fill: #0d47a1;
+}
+
+.dialog-pane.informacion .header-panel .label {
+    -fx-text-fill: #1565c0;
+}
+
+.dialog-pane.informacion .button {
+    -fx-background-color: linear-gradient(to bottom, #2196F3, #1976D2);
+    -fx-text-fill: white;
+}
+
+.dialog-pane.informacion .button:hover {
+    -fx-background-color: linear-gradient(to bottom, #1E88E5, #1565C0);
+}
+
+.dialog-pane.informacion .button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #1976D2, #0D47A1);
+}
+
+/* Estilo para alertas de confirmación */
+.dialog-pane.confirmacion {
+    -fx-background-color: #fff8e1;
+    -fx-border-color: #ffb300;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.confirmacion .content {
+    -fx-text-fill: #5d4037;
+}
+
+.dialog-pane.confirmacion .header-panel .label {
+    -fx-text-fill: #ff6f00;
+}
+
+.dialog-pane.confirmacion .button {
+    -fx-background-color: linear-gradient(to bottom, #42a5f5, #1e88e5);
+    -fx-text-fill: white;
+}
+
+.dialog-pane.confirmacion .button:hover {
+    -fx-background-color: linear-gradient(to bottom, #39a1f4, #1976d2);
+}
+
+.dialog-pane.confirmacion .button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #1e88e5, #0d47a1);
+}
+
+/* Estilo para alertas de advertencia (warning) */
+.dialog-pane.warning {
+    -fx-background-color: #fff8e1;
+    -fx-border-color: #ffb300;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.warning .content {
+    -fx-text-fill: #5d4037;
+}
+
+.dialog-pane.warning .header-panel .label {
+    -fx-text-fill: #ff6f00;
+}
+
+.dialog-pane.warning .button {
+    -fx-background-color: linear-gradient(to bottom, #ffb300, #ffa000);
+    -fx-text-fill: #5d4037;
+}
+
+.dialog-pane.warning .button:hover {
+    -fx-background-color: linear-gradient(to bottom, #ffc107, #ffb300);
+}
+
+.dialog-pane.warning .button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #ffa000, #ff8f00);
+}
+
+
+
+
+/* Estilo general para alertas de éxito */
+.dialog-pane.exito {
+    -fx-background-color: #e6ffe6;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.exito .content {
+    -fx-text-fill: #2e7d32;
+}
+
+.dialog-pane.exito .header-panel .label {
+    -fx-text-fill: #1b5e20;
+}
+
+/* Estilo general para errores */
+.dialog-pane.error {
+    -fx-background-color: #ffe6e6;
+    -fx-border-color: #f44336;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.error .content {
+    -fx-text-fill: #b71c1c;
+}
+
+.dialog-pane.error .header-panel .label {
+    -fx-text-fill: #d32f2f;
+}
+
+/* Estilo específico para alerta de reserva duplicada */
+.dialog-pane.reserva-duplicada {
+    -fx-background-color: #fff3e0;
+    -fx-border-color: #ff9800;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.reserva-duplicada .content {
+    -fx-text-fill: #e65100;
+}
+
+.dialog-pane.reserva-duplicada .header-panel .label {
+    -fx-text-fill: #ef6c00;
+}
+
+/* Estilo para alertas de información */
+.dialog-pane.informacion {
+    -fx-background-color: #e3f2fd;
+    -fx-border-color: #2196F3;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.informacion .content {
+    -fx-text-fill: #0d47a1;
+}
+
+.dialog-pane.informacion .header-panel .label {
+    -fx-text-fill: #1565c0;
+}
+
+/* Estilo para alertas de confirmación */
+.dialog-pane.confirmacion {
+    -fx-background-color: #fff8e1;  /* Amarillo muy claro */
+    -fx-border-color: #ffb300;      /* Amarillo/naranja */
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.confirmacion .content {
+    -fx-text-fill: #5d4037;        /* Marrón oscuro para contraste */
+}
+
+.dialog-pane.confirmacion .header-panel .label {
+    -fx-text-fill: #ff6f00;        /* Naranja oscuro */
+}
+
+/* Opcional: Estilo para botones de confirmación */
+.dialog-pane.confirmacion .button {
+    -fx-background-color: #ffb300;
+    -fx-text-fill: #5d4037;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane.confirmacion .button:hover {
+    -fx-background-color: #ffa000;
+}
+
+/* Estilo para alertas de advertencia (warning) */
+.dialog-pane.warning {
+    -fx-background-color: #fff8e1;  /* Amarillo pálido */
+    -fx-border-color: #ffb300;      /* Amarillo/naranja */
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.warning .content {
+    -fx-text-fill: #5d4037;         /* Marrón oscuro */
+}
+
+.dialog-pane.warning .header-panel .label {
+    -fx-text-fill: #ff6f00;         /* Naranja intenso */
+}
+
+/* Estilos opcionales para botones en ambos tipos */
+.dialog-pane.confirmacion .button {
+    -fx-background-color: #42a5f5;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane.confirmacion .button:hover {
+    -fx-background-color: #1e88e5;
+}
+
+.dialog-pane.warning .button {
+    -fx-background-color: #ffb300;
+    -fx-text-fill: #5d4037;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane.warning .button:hover {
+    -fx-background-color: #ffa000;
+}
+
+/* Base para todos los botones en alertas */
+.dialog-pane .button {
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 0, 2, 3, 0);
+    -fx-transition: all 0.3s;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.dialog-pane .button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 0, 4, 5, 0);
+    -fx-translate-y: -2px;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.dialog-pane .button:pressed {
+    -fx-translate-y: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 0, 1, 2, 0);
+}
+
+.dialog-pane .button:focused {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 0, 0, 0, 3);
+}
+
+/* Estilo general para alertas de éxito */
+.dialog-pane.exito {
+    -fx-background-color: #e6ffe6;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.dialog-pane.exito .content {
+    -fx-text-fill: #2e7d32;
+}
+
+.dialog-pane.exito .header-panel .label {
+    -fx-text-fill: #1b5e20;
+}
+
+.dialog-pane.exito .button {
+    -fx-background-color: linear-gradient(to bottom, #4CAF50, #388E3C);
+    -fx-text-fill: white;
+}
+
+.dialog-pane.exito .button:hover {
+    -fx-background-color: linear-gradient(to bottom, #43A047, #2E7D32);
+}
+
+.dialog-pane.exito .button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #388E3C, #1B5E20);
+}
+

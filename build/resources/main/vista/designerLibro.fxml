@@ -9,70 +9,82 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="654.0" prefWidth="651.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorLibro">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorLibro">
    <children>
-      <HBox prefHeight="406.0" prefWidth="621.0">
+      <HBox prefHeight="447.0" prefWidth="770.0">
          <children>
-            <VBox prefHeight="343.0" prefWidth="315.0">
+            <VBox prefHeight="370.0" prefWidth="411.0">
                <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox prefHeight="67.0" prefWidth="384.0">
                      <children>
-                        <Label mnemonicParsing="true" text="_Título" />
-                        <TextField fx:id="txtTitulo" prefWidth="200.0">
+                        <Label mnemonicParsing="true" text="_Título">
+                           <padding>
+                              <Insets left="10.0" />
+                           </padding></Label>
+                        <TextField fx:id="txtTitulo" prefHeight="25.0" prefWidth="264.0">
                            <HBox.margin>
-                              <Insets left="25.0" />
+                              <Insets left="40.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
                   </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox prefHeight="109.0" prefWidth="384.0">
                      <children>
-                        <Label mnemonicParsing="true" text="_ISBN" />
-                        <TextField fx:id="txtISBN" maxWidth="200.0" prefWidth="200.0">
+                        <Label mnemonicParsing="true" text="_ISBN">
                            <HBox.margin>
-                              <Insets left="30.0" />
+                              <Insets left="5.0" />
+                           </HBox.margin></Label>
+                        <TextField fx:id="txtISBN" maxWidth="266.0" prefHeight="25.0" prefWidth="266.0">
+                           <HBox.margin>
+                              <Insets left="45.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
                   </HBox>
-                  <TextField fx:id="txtCategoriaIntroducida" promptText="Introduce la categoría">
+                  <TextField fx:id="txtCategoriaIntroducida" maxWidth="340.0" prefWidth="500.0" promptText="Introduce la categoría">
                      <VBox.margin>
-                        <Insets top="10.0" />
+                        <Insets left="10.0" top="10.0" />
                      </VBox.margin>
                   </TextField>
-                  <ListView fx:id="lstCategorias" prefHeight="200.0" prefWidth="200.0" />
-                  <TextField fx:id="txtCategoriaElegida" editable="false" />
+                  <ListView fx:id="lstCategorias" maxWidth="340.0" prefHeight="200.0" prefWidth="500.0">
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin></ListView>
+                  <TextField fx:id="txtCategoriaElegida" editable="false" maxWidth="340.0" prefWidth="500.0">
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin></TextField>
                </children>
             </VBox>
-            <VBox prefHeight="343.0" prefWidth="291.0">
+            <VBox prefHeight="370.0" prefWidth="397.0">
                <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox prefHeight="65.0" prefWidth="371.0">
                      <children>
                         <Label mnemonicParsing="true" text="_Total de copias" />
-                        <TextField fx:id="txtTotalCopias" prefWidth="200.0">
+                        <TextField fx:id="txtTotalCopias" prefHeight="25.0" prefWidth="227.0">
                            <HBox.margin>
-                              <Insets left="10.0" />
+                              <Insets left="26.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
                   </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox prefHeight="107.0" prefWidth="371.0">
                      <children>
                         <Label mnemonicParsing="true" text="_Descripción" />
-                        <TextArea fx:id="txtDescripcion" prefHeight="200.0" prefWidth="200.0" wrapText="true">
+                        <TextArea fx:id="txtDescripcion" prefHeight="80.0" prefWidth="227.0" wrapText="true">
                            <HBox.margin>
-                              <Insets left="29.0" />
+                              <Insets left="46.0" />
                            </HBox.margin>
                         </TextArea>
                      </children>
                   </HBox>
-                  <TextField fx:id="txtEditorialIntroducida" promptText="Introduce la editorial">
+                  <TextField fx:id="txtEditorialIntroducida" maxWidth="340.0" prefWidth="500.0" promptText="Introduce la editorial">
                      <VBox.margin>
                         <Insets top="15.0" />
                      </VBox.margin>
                   </TextField>
-                  <ListView fx:id="lstEditoriales" prefHeight="200.0" prefWidth="200.0" />
-                  <TextField fx:id="txtEditorialElegida" editable="false" />
+                  <ListView fx:id="lstEditoriales" maxWidth="340.0" prefHeight="200.0" prefWidth="400.0" />
+                  <TextField fx:id="txtEditorialElegida" editable="false" maxWidth="340.0" prefWidth="500.0" />
                </children>
                <HBox.margin>
                   <Insets left="15.0" />
@@ -80,14 +92,14 @@
             </VBox>
          </children>
       </HBox>
-      <TextField fx:id="txtAutorIntroducido" maxWidth="315.0" prefWidth="500.0" promptText="Introduce el autor">
+      <TextField fx:id="txtAutorIntroducido" maxWidth="340.0" prefWidth="500.0" promptText="Introduce el autor">
          <VBox.margin>
             <Insets top="15.0" />
          </VBox.margin>
       </TextField>
-      <ListView fx:id="lstAutores" maxWidth="315.0" prefHeight="200.0" prefWidth="500.0" />
-      <TextField fx:id="txtAutorElegido" editable="false" maxWidth="315.0" />
-      <HBox alignment="CENTER_RIGHT" prefHeight="58.0" prefWidth="621.0">
+      <ListView fx:id="lstAutores" maxWidth="340.0" prefHeight="200.0" prefWidth="500.0" />
+      <TextField fx:id="txtAutorElegido" editable="false" maxWidth="340.0" />
+      <HBox alignment="CENTER_RIGHT" prefHeight="85.0" prefWidth="726.0">
          <children>
             <Button fx:id="btnAceptar" mnemonicParsing="false" onAction="#btnAccionAceptar" text="Aceptar" />
             <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#btnAccionCancelar" text="Cancelar">

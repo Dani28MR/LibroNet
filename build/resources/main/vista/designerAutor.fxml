@@ -9,18 +9,18 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="443.0" prefWidth="522.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorAutor">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="443.0" prefWidth="563.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorAutor">
    <children>
       <HBox prefHeight="392.0" prefWidth="492.0">
          <children>
-            <VBox prefHeight="277.0" prefWidth="322.0">
+            <VBox prefHeight="346.0" prefWidth="400.0">
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Label mnemonicParsing="true" text="_Nombre" />
                         <TextField fx:id="txtNombre" prefWidth="200.0">
                            <HBox.margin>
-                              <Insets left="42.0" />
+                              <Insets left="57.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
@@ -30,7 +30,7 @@
                         <Label mnemonicParsing="true" text="_Apellidos" />
                         <TextField fx:id="txtApellidos" prefWidth="200.0">
                            <HBox.margin>
-                              <Insets left="37.0" />
+                              <Insets left="52.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
@@ -40,7 +40,7 @@
                         <Label mnemonicParsing="true" text="_Nacionalidad" />
                         <TextField fx:id="txtNacionalidad" prefWidth="200.0">
                            <HBox.margin>
-                              <Insets left="16.0" />
+                              <Insets left="31.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
@@ -50,7 +50,7 @@
                         <Label mnemonicParsing="true" text="_Biografía" />
                         <TextArea fx:id="txtBiografia" prefHeight="200.0" prefWidth="200.0" wrapText="true">
                            <HBox.margin>
-                              <Insets left="40.0" />
+                              <Insets left="55.0" />
                            </HBox.margin>
                         </TextArea>
                      </children>

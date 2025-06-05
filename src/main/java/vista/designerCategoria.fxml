@@ -7,22 +7,22 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="210.0" prefWidth="264.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorCategoria">
+<VBox styleClass="formulario-compacto contenedor-minimo" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorCategoria">
    <children>
       <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
          <children>
             <Label mnemonicParsing="true" text="_Nombre" />
-            <TextField fx:id="txtNombre" prefWidth="170.0">
+            <TextField fx:id="txtNombre" prefWidth="220.0">
                <HBox.margin>
-                  <Insets left="20.0" />
+                  <Insets left="37.0" />
                </HBox.margin>
             </TextField>
          </children>
       </HBox>
       <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
          <children>
-            <Button fx:id="btnAceptar" onAction="#btnAccionAceptar" prefWidth="70.0" text="_Aceptar" />
-            <Button fx:id="btnCancelar" onAction="#btnAccionCancelar" prefWidth="70.0" text="_Cancelar">
+            <Button fx:id="btnAceptar" onAction="#btnAccionAceptar" text="_Aceptar" />
+            <Button fx:id="btnCancelar" onAction="#btnAccionCancelar" text="_Cancelar">
                <HBox.margin>
                   <Insets left="15.0" />
                </HBox.margin>

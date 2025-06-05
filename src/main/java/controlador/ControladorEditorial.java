@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,6 +16,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -55,7 +57,10 @@ public class ControladorEditorial implements Initializable {
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
+        Platform.runLater(() -> {
+            String css = getClass().getResource("/style.css").toExternalForm();
+            btnAceptar.getScene().getStylesheets().add(css);
+        });
     }
     
     @FXML
@@ -240,6 +245,13 @@ public class ControladorEditorial implements Initializable {
 
     private void mostrarAlertaExito(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+        dialogPane.getStyleClass().add("informacion");
+            
+                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        alert.setTitle(titulo);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
@@ -251,6 +263,13 @@ public class ControladorEditorial implements Initializable {
 
     private void mostrarAlertaError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+        dialogPane.getStyleClass().add("error");
+            
+                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        alert.setTitle(titulo);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);

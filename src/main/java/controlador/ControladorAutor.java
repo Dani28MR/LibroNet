@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -66,6 +67,10 @@ public class ControladorAutor implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         
+        Platform.runLater(() -> {
+            String css = getClass().getResource("/style.css").toExternalForm();
+            btnAceptar.getScene().getStylesheets().add(css);
+        });
     }
     
     @FXML

@@ -22,7 +22,6 @@ public class Main extends Application {
         stage.setResizable(false);
         stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
         
-        //scene.getStylesheets().add(getClass().getResource("/styleVolunTime.css").toString());
         stage.setTitle("LibroNet");
         stage.show();
     }

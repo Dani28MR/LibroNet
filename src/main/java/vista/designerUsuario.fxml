@@ -9,18 +9,18 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="476.0" prefWidth="601.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorUsuario">
+<VBox prefHeight="456.0" prefWidth="707.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorUsuario">
    <children>
-      <HBox prefHeight="386.0" prefWidth="610.0">
+      <HBox prefHeight="329.0" prefWidth="702.0">
          <children>
-            <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="379.0">
+            <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="330.0" prefWidth="457.0">
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="200.0">
                      <children>
                         <Label mnemonicParsing="true" text="_Nombre" />
-                        <TextField fx:id="txtNombre" minWidth="200.0">
+                        <TextField fx:id="txtNombre" minHeight="30.0" minWidth="200.0">
                            <HBox.margin>
-                              <Insets left="133.0" />
+                              <Insets left="110.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
@@ -28,9 +28,9 @@
                   <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="200.0">
                      <children>
                         <Label mnemonicParsing="true" text="_Apellidos" />
-                        <TextField fx:id="txtApellidos" minWidth="200.0">
+                        <TextField fx:id="txtApellidos" minHeight="30.0" minWidth="200.0">
                            <HBox.margin>
-                              <Insets left="128.0" />
+                              <Insets left="105.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
@@ -38,9 +38,9 @@
                   <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="200.0">
                      <children>
                         <Label mnemonicParsing="true" text="_Email" />
-                        <TextField fx:id="txtEmail" minWidth="200.0">
+                        <TextField fx:id="txtEmail" minHeight="30.0" minWidth="200.0">
                            <HBox.margin>
-                              <Insets left="148.0" />
+                              <Insets left="125.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
@@ -48,9 +48,9 @@
                   <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="200.0">
                      <children>
                         <Label mnemonicParsing="true" text="_Teléfono" />
-                        <TextField fx:id="txtTelefono" minWidth="200.0">
+                        <TextField fx:id="txtTelefono" minHeight="30.0" minWidth="200.0">
                            <HBox.margin>
-                              <Insets left="130.0" />
+                              <Insets left="107.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
@@ -58,9 +58,9 @@
                   <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="496.0">
                      <children>
                         <Label mnemonicParsing="true" text="_Dirección" />
-                        <TextField fx:id="txtDireccion" minWidth="200.0">
+                        <TextField fx:id="txtDireccion" minHeight="30.0" minWidth="200.0">
                            <HBox.margin>
-                              <Insets left="128.0" />
+                              <Insets left="105.0" />
                            </HBox.margin>
                         </TextField>
                      </children>
@@ -68,26 +68,26 @@
                   <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="200.0">
                      <children>
                         <Label mnemonicParsing="true" text="_Contraseña" />
-                        <PasswordField fx:id="txtPassword" minWidth="200.0">
+                        <PasswordField fx:id="txtPassword" minHeight="30.0" minWidth="200.0">
                            <HBox.margin>
-                              <Insets left="117.0" />
+                              <Insets left="95.0" />
                            </HBox.margin>
                         </PasswordField>
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="200.0">
                      <children>
-                        <Label mnemonicParsing="true" text="_Confirmación contraseña" />
-                        <PasswordField fx:id="txtPasswordConfirmacion" minWidth="200.0">
+                        <Label mnemonicParsing="true" text="_Confirmación " />
+                        <PasswordField fx:id="txtPasswordConfirmacion" minHeight="30.0" minWidth="200.0">
                            <HBox.margin>
-                              <Insets left="44.0" />
+                              <Insets left="80.0" />
                            </HBox.margin>
                         </PasswordField>
                      </children>
                   </HBox>
                </children>
             </VBox>
-            <VBox alignment="TOP_CENTER" prefHeight="386.0" prefWidth="185.0">
+            <VBox alignment="TOP_CENTER" prefHeight="386.0" prefWidth="251.0">
                <children>
                   <ImageView fx:id="imgUsuario" fitHeight="120.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true">
                      <VBox.margin>

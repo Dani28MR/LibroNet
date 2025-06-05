@@ -13,13 +13,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Base64;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -46,6 +51,7 @@ public class ControladorUsuario implements Initializable{
 
     @FXML
     private Button btnCancelar;
+    
 
     @FXML
     private Button btnImagen;
@@ -90,7 +96,10 @@ public class ControladorUsuario implements Initializable{
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
+        Platform.runLater(() -> {
+            String css = getClass().getResource("/style.css").toExternalForm();
+            btnAceptar.getScene().getStylesheets().add(css);
+        });
     }
     
     @FXML
@@ -110,7 +119,7 @@ public class ControladorUsuario implements Initializable{
     void btnAccionCancelar(ActionEvent event) {
         cerrarVentana(event);
     }
-
+    
     @FXML
     void btnAccionImagen(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
@@ -126,7 +135,6 @@ public class ControladorUsuario implements Initializable{
             ((Node) event.getSource()).getScene().getWindow()
         );
 
-        // 5. Guardar la ruta solo si se seleccionó un archivo
         if (archivoSeleccionado != null) {
             try {
                 rutaImg = archivoSeleccionado;
@@ -392,6 +400,9 @@ public class ControladorUsuario implements Initializable{
     public void setControladorLogin(ControladorLogin cLogin,Boolean b) {
         this.cLogin = cLogin;
         this.crearUs = b;
+        if (b) {
+            
+        }
         initDatos();
     }
     public void setOperacion(OperacionUsuario operacion) {
@@ -425,6 +436,13 @@ public class ControladorUsuario implements Initializable{
     
     private void mostrarAlertaExito(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+        dialogPane.getStyleClass().add("informacion");
+            
+                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        alert.setTitle(titulo);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
@@ -436,6 +454,13 @@ public class ControladorUsuario implements Initializable{
 
     private void mostrarAlertaError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+        dialogPane.getStyleClass().add("error");
+            
+                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        alert.setTitle(titulo);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);

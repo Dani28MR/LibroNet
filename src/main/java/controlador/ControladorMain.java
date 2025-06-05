@@ -32,6 +32,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
@@ -367,6 +368,10 @@ public class ControladorMain implements Initializable{
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Platform.runLater(() -> {
+            String css = getClass().getResource("/styleMain.css").toExternalForm();
+            btnSalir.getScene().getStylesheets().add(css);
+        });
         try {
             conexion = ConexionSingleton.obtenerConexion();
             if (conexion != null) {
@@ -606,19 +611,32 @@ public class ControladorMain implements Initializable{
 
             if (tieneReservasInactivas(idLibro)) {
                 Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+                DialogPane dialogPane = alerta.getDialogPane();
+                dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+                dialogPane.getStyleClass().add("confirmacion");
+                
+                Stage alertStage = (Stage) alerta.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+                
                 alerta.setTitle("Reservas Inactivas Encontradas");
                 alerta.setHeaderText("Este libro tiene reservas INACTIVAS asociadas.");
                 alerta.setContentText("¿Deseas eliminar también estas reservas inactivas y luego el libro?");
                 Optional<ButtonType> respuesta = alerta.showAndWait();
 
                 if (!(respuesta.isPresent() && respuesta.get() == ButtonType.OK)) {
-                    return; // El usuario canceló
+                    return;
                 }
 
                 eliminarReservasInactivas(idLibro);
             }
 
             Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            DialogPane dialogPane = confirmacion.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("confirmacion");
+            
+                Stage alertStage = (Stage) confirmacion.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el libro?");
             confirmacion.setContentText("Esta acción no se puede deshacer.");
@@ -683,6 +701,13 @@ public class ControladorMain implements Initializable{
     
     public void mostrarAlertaExito(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+        dialogPane.getStyleClass().add("informacion");
+            
+        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+        
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
@@ -691,6 +716,12 @@ public class ControladorMain implements Initializable{
     
     void mostrarAlertaError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+        dialogPane.getStyleClass().add("error");
+            
+        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
@@ -762,6 +793,12 @@ public class ControladorMain implements Initializable{
 
             // Confirmación de eliminación
             Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            DialogPane dialogPane = confirmacion.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("confirmacion");
+            
+                Stage alertStage = (Stage) confirmacion.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar este autor?");
             confirmacion.setContentText("¡Esta acción no se puede deshacer!");
@@ -857,6 +894,12 @@ public class ControladorMain implements Initializable{
             }
 
             Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            DialogPane dialogPane = confirmacion.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("confirmacion");
+            
+                Stage alertStage = (Stage) confirmacion.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar la editorial?");
             confirmacion.setContentText("¡Esta acción no se puede deshacer!");
@@ -945,6 +988,12 @@ public class ControladorMain implements Initializable{
             }
 
             Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            DialogPane dialogPane = confirmacion.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("confirmacion");
+            
+                Stage alertStage = (Stage) confirmacion.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar la categoría?");
             confirmacion.setContentText("¡Esta acción no se puede deshacer!");
@@ -1056,6 +1105,12 @@ public class ControladorMain implements Initializable{
 
             // Confirmación con advertencia de reservas inactivas
             Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            DialogPane dialogPane = confirmacion.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("confirmacion");
+            
+                Stage alertStage = (Stage) confirmacion.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText("¿Estás seguro de que deseas eliminar el usuario?");
             String mensaje = tieneInactivas
@@ -1149,6 +1204,12 @@ public class ControladorMain implements Initializable{
     public void reservarLibroConConfirmacion(Libro libroSeleccionado) {
         if (libroSeleccionado == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("warning");
+            
+                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
             alert.setTitle("Reserva");
             alert.setHeaderText(null);
             alert.setContentText("Debes seleccionar un libro para reservar.");
@@ -1157,6 +1218,12 @@ public class ControladorMain implements Initializable{
         }
 
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            DialogPane dialogPane = confirmacion.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("confirmacion");
+            
+                Stage alertStage = (Stage) confirmacion.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
         confirmacion.setTitle("Confirmar reserva");
         confirmacion.setHeaderText("¿Deseas reservar el libro?");
         confirmacion.setContentText("Libro: " + libroSeleccionado.getTitulo());
@@ -1175,22 +1242,14 @@ public class ControladorMain implements Initializable{
                     ResultSet rs = psCheck.executeQuery();
                     if (rs.next() && rs.getInt(1) > 0) {
                         conexion.rollback();
-                        Alert dup = new Alert(Alert.AlertType.ERROR);
-                        dup.setTitle("Error en reserva");
-                        dup.setHeaderText("Reserva duplicada");
-                        dup.setContentText("Ya tienes una reserva activa para este libro.");
-                        dup.showAndWait();
+                        mostrarAlertaError("Reserva duplicada", "Ya hay una reserva activa para este libro");
                         return;
                     }
                 }
 
                 if (libroSeleccionado.getCopiasDisponibles() <= 0) {
                     conexion.rollback();
-                    Alert sinCopias = new Alert(Alert.AlertType.ERROR);
-                    sinCopias.setTitle("Sin copias disponibles");
-                    sinCopias.setHeaderText("No se puede completar la reserva.");
-                    sinCopias.setContentText("No hay copias disponibles de: " + libroSeleccionado.getTitulo());
-                    sinCopias.showAndWait();
+                    mostrarAlertaError("Sin copias disponibles", "No hay copias disponibles de: " + libroSeleccionado.getTitulo());
                     return;
                 }
 
@@ -1212,26 +1271,19 @@ public class ControladorMain implements Initializable{
                     int rowsAffected = psUpdate.executeUpdate();
                     if (rowsAffected == 0) {
                         conexion.rollback();
-                        Alert errorUpd = new Alert(Alert.AlertType.ERROR);
-                        errorUpd.setTitle("Error");
-                        errorUpd.setHeaderText("No se pudo actualizar las copias.");
-                        errorUpd.setContentText("Intenta nuevamente más tarde.");
-                        errorUpd.showAndWait();
+                        mostrarAlertaError("No se pudo actualizar las copias.", "Intenta nuevamente más tarde.");
                         return;
                     }
 
                     conexion.commit();
 
                     LocalDate expira = LocalDate.now().plusMonths(1);
-                    Alert exito = new Alert(Alert.AlertType.INFORMATION);
-                    exito.setTitle("Reserva exitosa");
-                    exito.setHeaderText(null);
-                    exito.setContentText("Reserva realizada con éxito para: " 
+                    
+                    mostrarAlertaExito("Reserva exitosa", "Reserva realizada con éxito para: " 
                                          + libroSeleccionado.getTitulo() 
                                          + "\nLa reserva expirará el: " 
                                          + expira.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                                          + "\n(Duración: 1 mes)");
-                    exito.showAndWait();
 
                     // Refrescar tabla
                     if (opcDisponibles.isSelected()) {
@@ -1249,10 +1301,8 @@ public class ControladorMain implements Initializable{
             } catch (SQLException e) {
                 try { conexion.rollback(); } catch (SQLException ex) { /* Ignorar */ }
                 Alert error = new Alert(Alert.AlertType.ERROR);
-                error.setTitle("Error");
-                error.setHeaderText("Fallo en la reserva.");
-                error.setContentText("Detalles: " + e.getMessage());
-                error.showAndWait();
+                
+                mostrarAlertaError("Fallo en la reserva.", "Detalles: " + e.getMessage());
 
             } finally {
                 try { conexion.setAutoCommit(true); } catch (SQLException e) { /* Ignorar */ }
@@ -1265,6 +1315,12 @@ public class ControladorMain implements Initializable{
         if (libroSeleccionado == null) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            DialogPane dialogPane = confirm.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("confirmacion");
+            
+                Stage alertStage = (Stage) confirm.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
         confirm.setTitle("Anular reserva");
         confirm.setHeaderText("¿Seguro que quieres anular la reserva de:");
         confirm.setContentText(libroSeleccionado.getTitulo());
@@ -1293,14 +1349,12 @@ public class ControladorMain implements Initializable{
 
                 if (mod1 == 0 || mod2 == 0) {
                     conexion.rollback();
-                    new Alert(Alert.AlertType.ERROR, 
-                        "No se pudo anular la reserva correctamente.").showAndWait();
+                    mostrarAlertaError("Error", "No se pudo anular la reserva correctamente.");
                     return;
                 }
 
                 conexion.commit();
-                new Alert(Alert.AlertType.INFORMATION, 
-                    "Reserva anulada y copia recuperada.").showAndWait();
+                mostrarAlertaExito("Perfecto", "Reserva anulada y copia recuperada.");
 
                 // Refrescar tablas
                 if (opcDisponibles.isSelected()) {
@@ -1316,8 +1370,8 @@ public class ControladorMain implements Initializable{
             }
         } catch (SQLException ex) {
             try { conexion.rollback(); } catch (SQLException __) { }
-            new Alert(Alert.AlertType.ERROR, 
-                "Error al anular la reserva: " + ex.getMessage()).showAndWait();
+            mostrarAlertaError("Error", "Error al anular la reserva: " + ex.getMessage());
+            
         } finally {
             try { conexion.setAutoCommit(true); } catch (SQLException __) { }
         }
@@ -1342,6 +1396,12 @@ public class ControladorMain implements Initializable{
     
     public void cancelarReservaDeUsuarioPorAdministrador() {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            DialogPane dialogPane = confirm.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("confirmacion");
+            
+                Stage alertStage = (Stage) confirm.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
         confirm.setTitle("Anular reserva");
         confirm.setHeaderText("¿Seguro que deseas anular la reserva del libro para el usuario seleccionado?");
         confirm.setContentText("Libro: " + libroSeleccionadoReserva.getTitulo() + 
@@ -1371,14 +1431,12 @@ public class ControladorMain implements Initializable{
 
                 if (mod1 == 0 || mod2 == 0) {
                     conexion.rollback();
-                    new Alert(Alert.AlertType.ERROR, 
-                        "No se pudo anular la reserva correctamente.").showAndWait();
+                    mostrarAlertaError("Error", sqlAnular);
                     return;
                 }
 
                 conexion.commit();
-                new Alert(Alert.AlertType.INFORMATION, 
-                    "Reserva anulada y copia devuelta al inventario.").showAndWait();
+                mostrarAlertaExito("Anular", "Reserva anulada y copia devuelta al inventario.");
 
                 if (opcDisponibles.isSelected()) {
                     tbvLibros.setItems(listaLibrosDisponibles());
@@ -1395,8 +1453,7 @@ public class ControladorMain implements Initializable{
 
         } catch (SQLException ex) {
             try { conexion.rollback(); } catch (SQLException __) { }
-            new Alert(Alert.AlertType.ERROR, 
-                "Error al anular la reserva: " + ex.getMessage()).showAndWait();
+            mostrarAlertaError("Error", "Error al anular la reserva: " + ex.getMessage());
         } finally {
             try { conexion.setAutoCommit(true); } catch (SQLException __) { }
         }
@@ -1407,6 +1464,13 @@ public class ControladorMain implements Initializable{
     public void reservarLibroAUsuarioPorAdministrador(Libro libroSeleccionado) {
         if (libroSeleccionado == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("warning");
+            
+                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
+            
             alert.setTitle("Reserva");
             alert.setHeaderText(null);
             alert.setContentText("Debes seleccionar un libro para reservar.");
@@ -1415,6 +1479,12 @@ public class ControladorMain implements Initializable{
         }
 
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            DialogPane dialogPane = confirmacion.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/alerta.css").toExternalForm());
+            dialogPane.getStyleClass().add("confirmacion");
+            
+                Stage alertStage = (Stage) confirmacion.getDialogPane().getScene().getWindow();
+                alertStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
         confirmacion.setTitle("Confirmar reserva");
         confirmacion.setHeaderText("¿Deseas reservar el libro?");
         confirmacion.setContentText("Libro: " + libroSeleccionado.getTitulo());
@@ -1433,22 +1503,14 @@ public class ControladorMain implements Initializable{
                     ResultSet rs = psCheck.executeQuery();
                     if (rs.next() && rs.getInt(1) > 0) {
                         conexion.rollback();
-                        Alert dup = new Alert(Alert.AlertType.ERROR);
-                        dup.setTitle("Error en reserva");
-                        dup.setHeaderText("Reserva duplicada");
-                        dup.setContentText("Ya tienes una reserva activa para este libro.");
-                        dup.showAndWait();
+                        mostrarAlertaError("Error en la reserva", "Ya tienes una reserva activa para este libro");
                         return;
                     }
                 }
 
                 if (libroSeleccionado.getCopiasDisponibles() <= 0) {
                     conexion.rollback();
-                    Alert sinCopias = new Alert(Alert.AlertType.ERROR);
-                    sinCopias.setTitle("Sin copias disponibles");
-                    sinCopias.setHeaderText("No se puede completar la reserva.");
-                    sinCopias.setContentText("No hay copias disponibles de: " + libroSeleccionado.getTitulo());
-                    sinCopias.showAndWait();
+                    mostrarAlertaError("Sin copias disponibles", "No hay copias disponibles de: " + libroSeleccionado.getTitulo());
                     return;
                 }
 
@@ -1470,26 +1532,18 @@ public class ControladorMain implements Initializable{
                     int rowsAffected = psUpdate.executeUpdate();
                     if (rowsAffected == 0) {
                         conexion.rollback();
-                        Alert errorUpd = new Alert(Alert.AlertType.ERROR);
-                        errorUpd.setTitle("Error");
-                        errorUpd.setHeaderText("No se pudo actualizar las copias.");
-                        errorUpd.setContentText("Intenta nuevamente más tarde.");
-                        errorUpd.showAndWait();
+                        mostrarAlertaError("Error", "No se pudo actualizar las copias, intentalo nuevamente más tarde.");
                         return;
                     }
 
                     conexion.commit();
 
                     LocalDate expira = LocalDate.now().plusMonths(1);
-                    Alert exito = new Alert(Alert.AlertType.INFORMATION);
-                    exito.setTitle("Reserva exitosa");
-                    exito.setHeaderText(null);
-                    exito.setContentText("Reserva realizada con éxito para: " 
+                    mostrarAlertaExito("Reserva exitosa", "Reserva realizada con éxito para: " 
                                          + libroSeleccionado.getTitulo() 
                                          + "\nLa reserva expirará el: " 
                                          + expira.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                                          + "\n(Duración: 1 meses)");
-                    exito.showAndWait();
                     
                     if (opcDisponibles.isSelected()) {
                         tbvLibros.setItems(listaLibrosDisponibles());
@@ -1505,11 +1559,7 @@ public class ControladorMain implements Initializable{
 
             } catch (SQLException e) {
                 try { conexion.rollback(); } catch (SQLException ex) { /*…*/ }
-                Alert error = new Alert(Alert.AlertType.ERROR);
-                error.setTitle("Error");
-                error.setHeaderText("Fallo en la reserva.");
-                error.setContentText("Detalles: " + e.getMessage());
-                error.showAndWait();
+                mostrarAlertaError("Error", "Fallo en la reserva");
 
             } finally {
                 try { conexion.setAutoCommit(true); } catch (SQLException e) { /*…*/ }
