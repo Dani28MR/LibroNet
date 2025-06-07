@@ -368,10 +368,7 @@ public class ControladorMain implements Initializable{
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Platform.runLater(() -> {
-            String css = getClass().getResource("/styleMain.css").toExternalForm();
-            btnSalir.getScene().getStylesheets().add(css);
-        });
+        
         try {
             conexion = ConexionSingleton.obtenerConexion();
             if (conexion != null) {
@@ -379,6 +376,10 @@ public class ControladorMain implements Initializable{
                 procesarReservasExpiradas();
                 eliminarReservasMuyAntiguas();
                 configurarFiltros();
+                Platform.runLater(() -> {
+                    String css = getClass().getResource("/styleMain.css").toExternalForm();
+                    btnSalir.getScene().getStylesheets().add(css);
+                });
             }
 
             inicializarImagenes();

@@ -126,7 +126,7 @@ public class ControladorLogin implements Initializable{
             ));
             mainStage.setScene(new Scene(root));
             mainStage.setResizable(false);
-            mainStage.show();
+            mainStage.showAndWait();
 
         } catch (IOException e) {
             System.err.println("Error al cargar ventana principal: " + e.getMessage());
@@ -236,7 +236,7 @@ public class ControladorLogin implements Initializable{
             stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icono.png")));
             stage.setScene(new Scene(root));
             stage.setResizable(false);
-            stage.show();
+            stage.showAndWait();
 
         } catch (IOException e) {
             System.err.println("Error al cargar el archivo FXML: " + e.getMessage());
